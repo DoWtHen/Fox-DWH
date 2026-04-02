@@ -26,7 +26,6 @@ MsgBox Space(36) & "Infók a makrókról 1.rész:" & vbCrLf & Elso_cella & vbCrL
 ScrollLefele & vbCrLf & MindenLap_Legfelulre & vbCrLf & AutoSzurok_KI_BE & vbCrLf & Kozepre_Igazit & vbCrLf & ZoomFel & vbCrLf & Zoom100 & vbCrLf & ZoomLe & vbCrLf & Space(90) & Aktualis, , "Információk"
 End Sub
 
-
 Sub info_2()
 ' DoWtHen Makró 2025.07.15
 
