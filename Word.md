@@ -1,2 +1,0 @@
-# Fox-DWh
-## Word Makrók:
