@@ -1,5 +1,5 @@
 # Fox-DWH Word:
-## Excel Personal kódok:
+## Word Mértékegységek kódok:
 
 ```vba
 Sub negyzetmeter()
