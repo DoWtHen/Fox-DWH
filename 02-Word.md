@@ -1,4 +1,4 @@
-# Fox-DWH Excel:
+# Fox-DWH Word:
 ## Excel Personal kódok:
 
 ```vba
