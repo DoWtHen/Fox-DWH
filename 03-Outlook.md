@@ -2,6 +2,43 @@
 ## Outlook makró a levelek áthelyezésére:
 
 ```vba
+Sub Kijelolt_Emailek_Athelyezese_Tallozas()
+' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT MAPPA TALLÓZÁS ABLAKKAL
+    
+    On Error GoTo ErrHandler
+
+    Dim ns As Outlook.NameSpace
+    Dim destFolder As Outlook.MAPIFolder
+    Dim itm As Object
+
+    Set ns = Application.GetNamespace("MAPI")
+
+    ' --- Mappa tallózó ablak megnyitása ---
+    Set destFolder = ns.PickFolder
+    If destFolder Is Nothing Then
+        MsgBox "Nincs kiválasztott célmappa.", vbExclamation
+        Exit Sub
+    End If
+
+    If Application.ActiveExplorer.Selection.Count = 0 Then
+        MsgBox "Nincs kijelölt elem.", vbExclamation
+        Exit Sub
+    End If
+
+    For Each itm In Application.ActiveExplorer.Selection
+        If TypeOf itm Is Outlook.MailItem Then
+            itm.Move destFolder
+        End If
+    Next itm
+
+    MsgBox "Áthelyezés kész.", vbInformation
+    Exit Sub
+
+ErrHandler:
+    MsgBox "Hiba történt: " & Err.Description, vbCritical
+End Sub
+
+
 Sub Kijelolt_Emailek_Athelyezese()
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT
 
