@@ -1,4 +1,4 @@
-#Segédletek és ötletek
+# Segédletek és ötletek
 
-##QR-kód generátor online:
+## QR-kód generátor online:
 [kód generátor](https://www.barcodesinc.com/)
