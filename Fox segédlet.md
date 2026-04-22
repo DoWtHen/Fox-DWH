@@ -16,10 +16,10 @@ If kerdes = vbYes Then
     Range("I2") = 0
     Range("H2,H3") = "MP"
     Range("I3").FormulaLocal = "=ÖSSZEFŰZ(I2;""-A"")"
-    Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$675;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$675;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$675;3;HAMIS);""nincs ilyen tárhely"")"
-    Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$675;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
 Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
 
     Range("H1:K3").Select
