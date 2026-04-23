@@ -1,5 +1,4 @@
 ```python
-
 Sub Toltheto_Tarhelyek()
 ' DoWtHen Makró 2026.04.22
 ' Foxconn segédlet
@@ -15,11 +14,20 @@ If kerdes = vbYes Then
     Range("K1") = "Üres tárhely"
     Range("I2") = 0
     Range("H2,H3") = "MP"
-    Range("I3").FormulaLocal = "=ÖSSZEFŰZ(I2;""-A"")"
-    Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
-    Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    'Range("I3").FormulaLocal = "=ÖSSZEFŰZ(I2;""-A"")"
+    'Az ősszefűz függvény angolul CONCATENATE, a fűz függvény CONCAT
+    Range("I3") = "=CONCAT(I2,""-A"")"
+    'Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("J2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
+
+    'Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("J3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
+    
+    'Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("K2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
+    
+    'Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("K3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
 Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
 
     Range("H1:K3").Select
