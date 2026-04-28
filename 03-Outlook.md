@@ -1,5 +1,5 @@
 # Fox-DWH Outlook:
-## Outlook makró a levelek áthelyezésére:
+## Outlook makró Sablon level megnyitása:
 
 ```vba
 Sub UjEmailSablonbol()
@@ -9,6 +9,8 @@ Sub UjEmailSablonbol()
     MyItem.Display
 End Sub
 ```
+## Outlook makró a levelek áthelyezésére:
+
 ```vba
 Sub Kijelolt_Emailek_Athelyezese_Tallozas()
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT MAPPA TALLÓZÁS ABLAKKAL
