@@ -2,6 +2,14 @@
 ## Outlook makró a levelek áthelyezésére:
 
 ```vba
+Sub UjEmailSablonbol()
+    Dim MyItem As Outlook.MailItem
+    Set MyItem = Application.CreateItemFromTemplate( _
+        "C:\Users\dowth\AppData\Roaming\Microsoft\Templates\dwh.oft")
+    MyItem.Display
+End Sub
+```
+```vba
 Sub Kijelolt_Emailek_Athelyezese_Tallozas()
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT MAPPA TALLÓZÁS ABLAKKAL
     
