@@ -1,5 +1,5 @@
 # Fox-DWH Outlook:
-## Outlook makró Sablon level megnyitása:
+## Outlook makró sablon level megnyitása:
 
 ```vba
 Sub UjEmailSablonbol()
