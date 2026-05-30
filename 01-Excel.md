@@ -238,3 +238,92 @@ Hibasor:
 MsgBox "Nincs ilyen mappa:  " & menteshelye & vbCrLf & "Hozd létre a mappát vagy változtasd meg a makróban a mappa elérési útvonalat.", vbCritical, "Nincs Mentési Mappa"
 End Sub
 ```
+
+```vba
+Function SzinSzamolas(rng As Range, colorCell As Range) As Long
+' DoWtHen Makró 2026.05.30
+' Foxconn segédlet
+' Szín számoló függvény
+' pl.: beírható a cellába is ha a függvény elérhető
+' =SzinSzamolas(C2:C23  ;                    C1)
+'            tartomány  ;  a színt tartalmazó cella amit számolni kell
+' Copilot segítséggel
+
+    Dim c As Range
+    Dim cnt As Long
+    
+    For Each c In rng
+        If c.Interior.Color = colorCell.Interior.Color Then
+            cnt = cnt + 1
+        End If
+    Next c
+    SzinSzamolas = cnt
+End Function
+
+
+Sub Aranyok()
+' DoWtHen Makró 2026.05.30
+' Foxconn segédlet
+' Arányszámítás a WO kittingeléshez
+
+Dim UtolsoA As Long
+Dim kerdes As Integer
+ 
+UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
+
+
+kerdes = MsgBox("Képleteket írok a G1 cellától!" & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adat másolása")
+
+If kerdes = vbYes Then
+    Range("G1") = "Össz.sor"
+    'Range("G2").FormulaLocal = "=DARAB2(A2:A" & UtolsoA & ")" 'magyar verzió
+    Range("G2").Formula = "=COUNTA(A2:A" & UtolsoA & ")"
+
+    Range("H1").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    Range("H1") = "Zöld"
+    'Range("H2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";H1)" 'magyar verzió
+    'Range("H2").Formula = "=SzinSzamolas(C2:C" & UtolsoA & ",H1)"
+    Range("H2").Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("H1")) 'ez csak eredményt ír be
+ 
+    Range("I1").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    Range("I1") = "Sárga"
+    'Range("I2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";I1)" 'magyar verzió
+    'Range("I2").Formula = "=SzinSzamolas(C2:C" & UtolsoA & ",I1)"
+    Range("I2").Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("I1")) 'ez csak eredményt ír be
+    
+    Range("J1") = "Üres"
+    Range("J2") = "=G2-(H2+I2)"
+    
+Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
+    
+    Application.CutCopyMode = False
+    Range("H3").Select
+    Selection.Style = "Percent"
+    ActiveCell.FormulaR1C1 = "=R[-1]C/R2C7"
+    Range("H3").Select
+    Selection.AutoFill Destination:=Range("H3:J3"), Type:=xlFillDefault
+    
+    Range("G1:J3").Select
+    With Selection
+        .HorizontalAlignment = xlCenter
+    End With
+    Range("G3").Select
+Else
+    MsgBox "Akkor kilépek.", , "Mégsem"
+End If
+End Sub
+```
