@@ -1,14 +1,4 @@
 # Fox-DWH Outlook:
-## Outlook makró sablon level megnyitása:
-
-```vba
-Sub UjEmailSablonbol()
-    Dim MyItem As Outlook.MailItem
-    Set MyItem = Application.CreateItemFromTemplate( _
-        "C:\Users\dowth\AppData\Roaming\Microsoft\Templates\dwh.oft")
-    MyItem.Display
-End Sub
-```
 ## Outlook makró a levelek áthelyezésére:
 
 ```vba
@@ -136,3 +126,13 @@ Sub PrintFolders(ByVal fld As Outlook.MAPIFolder, ByVal indent As String)
 End Sub
 ```
 
+## Outlook makró sablon level megnyitása:
+
+```vba
+Sub UjEmailSablonbol()
+    Dim MyItem As Outlook.MailItem
+    Set MyItem = Application.CreateItemFromTemplate( _
+        "C:\Users\dowth\AppData\Roaming\Microsoft\Templates\dwh.oft")
+    MyItem.Display
+End Sub
+```
