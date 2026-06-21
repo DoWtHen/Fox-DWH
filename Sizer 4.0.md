@@ -1,4 +1,4 @@
-# Sizer4 Makrók - www.brianapps.net
+# Sizer 4.0 Makrók - www.brianapps.net
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2026.06.21
 
 ### Makrók az ablakok elrendezéséhez.
