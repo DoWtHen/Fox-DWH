@@ -57,7 +57,7 @@ Minden ablak ``` w = 1000 h = 900 ``` méretű lesz.
 resize : proc[program_neve]* l = (($_index - 1) % 2) * (0.5 * w:workarea) t = 0 w = 1000 h = 900
 ```
 
-# 2 vagy több ablak elhelyezése fűggőlegesen:
+# 2 vagy több ablak elhelyezése függőlegesen:
 Bal oldalt kezdve arányosan eltolva teszi a következő ablakot egymás mellé.<br>
 Minden ablak ``` w = 1000 h = 900 ``` méretű lesz.
 
