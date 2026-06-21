@@ -2,7 +2,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2026.06.21
 
 ### Makrók az ablakok elrendezéséhez.
-Használatuknál be kell írni a program nevét(```program_neve```)
+Használatuknál be kell írni a program nevét (```program_neve```)
  kiterjesztés nélkül pl.:``` notepad ```.<br>
 A leírást csak másold be a macro létrehozása ablakba, nevezd el és próbálgasd, módosítsd.
 
