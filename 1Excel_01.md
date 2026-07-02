@@ -265,21 +265,31 @@ Sub Aranyok()
 ' DoWtHen Makró 2026.05.30
 ' Foxconn segédlet
 ' Arányszámítás a WO kittingeléshez
+' 2026.07.02 -> Flexibilis bárhová helyezhető (még mindig az A és C oszlopból számol)
 
 Dim UtolsoA As Long
 Dim kerdes As Integer
+Dim AktualCella As Range
+Dim destRange As Range
+Dim Kijeloles As Range
  
 UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
 
+Set AktualCella = ActiveCell 'a kijelölt cella ahova az Arányokat beírja
 
-kerdes = MsgBox("Képleteket írok a G1 cellától!" & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adat másolása")
 
-If kerdes = vbYes Then
-    Range("G1") = "Össz.sor"
+kerdes = MsgBox("Képleteket írok a(z)  " & Cells(ActiveCell.Row, ActiveCell.Column).Address(False, False) & "  cellától!" & vbCrLf & "Mehet??" & Space(15) & "====", vbYesNo + vbQuestion, "Adat másolása")
+
+ If kerdes <> vbYes Then 'ha nem igen kilépek
+        MsgBox "Akkor kilépek.", , "Mégsem"
+        Exit Sub
+ End If
+    
+    AktualCella.Value = "Össz.sor"
     'Range("G2").FormulaLocal = "=DARAB2(A2:A" & UtolsoA & ")" 'magyar verzió
-    Range("G2").Formula = "=COUNTA(A2:A" & UtolsoA & ")"
+    ActiveCell.Offset(1, 0).Formula = "=COUNTA(A2:A" & UtolsoA & ")"  'egy sorral lejebb
 
-    Range("H1").Select
+    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
     With Selection.Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
@@ -287,12 +297,12 @@ If kerdes = vbYes Then
         .TintAndShade = 0
         .PatternTintAndShade = 0
     End With
-    Range("H1") = "Zöld"
+    ActiveCell.Offset(0, 0) = "Zöld"  'ugyan oda
     'Range("H2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";H1)" 'magyar verzió
-    'Range("H2").Formula = "=SzinSzamolas(C2:C" & UtolsoA & ",H1)"
-    Range("H2").Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("H1")) 'ez csak eredményt ír be
+    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("H1"))  'egy sorral lejebb  ez csak eredményt ír be
+    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0))  'egy sorral lejebb  ez csak eredményt ír be
  
-    Range("I1").Select
+    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
     With Selection.Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
@@ -300,30 +310,35 @@ If kerdes = vbYes Then
         .TintAndShade = 0
         .PatternTintAndShade = 0
     End With
-    Range("I1") = "Sárga"
-    'Range("I2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";I1)" 'magyar verzió
-    'Range("I2").Formula = "=SzinSzamolas(C2:C" & UtolsoA & ",I1)"
-    Range("I2").Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("I1")) 'ez csak eredményt ír be
+    ActiveCell.Offset(0, 0) = "Sárga"  'ugyan oda
+    'Range("I2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";I1)" 'magyar verzi
+    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("I1")) 'egy sorral lejebb  ez csak eredményt ír be
+    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0)) 'egy sorral lejebb  ez csak eredményt ír be
     
-    Range("J1") = "Üres"
-    Range("J2") = "=G2-(H2+I2)"
-    
+    ActiveCell.Offset(0, 1) = "Üres"  'egy oszloppal jobbra
+    'ActiveCell.Offset(1, 1) = "=G2-(H2+I2)"  'egy sorral lejebb és egy oszloppal jobbra
+    ActiveCell.Offset(1, 1).Formula = "=" & AktualCella.Offset(1, 0).Address(False, False) & "-(" & AktualCella.Offset(1, 1).Address(False, False) & "+" & AktualCella.Offset(1, 2).Address(False, False) & ")"  'kivonás és összeadás eltolt cellákkal
+
 Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
     
     Application.CutCopyMode = False
-    Range("H3").Select
+    ActiveCell.Offset(2, -1).Select  'két sorral lejebb és egy oszloppal balra
     Selection.Style = "Percent"
-    ActiveCell.FormulaR1C1 = "=R[-1]C/R2C7"
-    Range("H3").Select
-    Selection.AutoFill Destination:=Range("H3:J3"), Type:=xlFillDefault
+
+    ActiveCell.Formula = "=" & ActiveCell.Offset(-1, 0).Address(False, False) & "/" & AktualCella.Offset(1, 0).Address(True, True)  'osztás eltolt cellákkal
     
-    Range("G1:J3").Select
+Set destRange = Range(ActiveCell, ActiveCell.Offset(0, 2)) 'tartomány megadása aktiv cellához képest
+
+    ActiveCell.AutoFill Destination:=destRange, Type:=xlFillDefault 'aktív cellától a megadott tartományig kijelölés
+    AktualCella.Select
+    
+Set Kijeloles = Range(AktualCella, ActiveCell.Offset(2, 3)) 'tartomány megadása aktiv cellához képest
+    
+    Kijeloles.Select  'középre igazítás
     With Selection
         .HorizontalAlignment = xlCenter
     End With
-    Range("G3").Select
-Else
-    MsgBox "Akkor kilépek.", , "Mégsem"
-End If
+    AktualCella.Select
 End Sub
+
 ```
