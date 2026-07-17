@@ -2,6 +2,27 @@
 ## Excel Personal kódok:
 
 ```vba
+Sub AutoSzurok_KI_BE()
+' DoWtHen Makró 2026.07.17
+' Auto Szűrők ki-be kapcsolása
+
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    ' Ha van szűrés, akkor törli
+    If ws.FilterMode Then
+        ws.ShowAllData
+    End If
+
+    ' Ha nincs AutoFilter a lapon, akkor bekapcsolja
+    If ws.AutoFilter Is Nothing Then
+        ' Itt állítsd be, melyik soron legyen az AutoFilter
+        ws.Range("A1").AutoFilter
+    End If
+End Sub
+```
+
+```vba
 Option Explicit
 
 Sub info()
