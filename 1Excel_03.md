@@ -78,7 +78,6 @@ ListaUtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella sz
     Range("A1").Select
 Application.Wait (Now + TimeValue("0:00:02")) ' Egy kis szünet
     Call Emailbe_ICk
-    
 End Sub
 
 
