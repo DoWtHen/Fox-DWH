@@ -1,3 +1,6 @@
+# IC leltár elküldendő adatok
+Ezzel már előrébb vagyok...
+
 ```vba
 
 Sub Programozott_ICk()
@@ -10,10 +13,22 @@ Dim SzurtUtolsoA As Long
 Dim ListaUtolsoA As Long
 Dim i As Long ' oszlopszélesség változója
 Dim kerdes As Integer
+Dim lang As Long 'Windows nyelv keresése
+Dim wordYes As String 'Windows nyelv keresése
 
-kerdes = MsgBox("Ez a makró a Programozott IC-k munkalapot szűri le." & vbCrLf & "Az Igenre kattintva kezdi a formázást." & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adatok szűrése")
+lang = Application.LanguageSettings.LanguageID(msoLanguageIDUI) 'Nyelvi kódtábla számát adja vissza
 
- If kerdes <> vbYes Then 'ha nemre kattintott kilépek
+    'kódtáblához igazodva írja ki az Igen szót
+    Select Case lang
+        Case 1033: wordYes = "Yes"
+        Case 1038: wordYes = "Igen"
+        Case 1031: wordYes = "Ja"
+        Case Else: wordYes = "Yes"   ' alapértelmezett
+    End Select
+
+kerdes = MsgBox("Ez a makró a Programozott IC-k munkalapot szűri le." & vbCrLf & "Az  " & wordYes & "-re kattintva kezdi a formázást." & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adatok szűrése")
+
+ If kerdes <> vbYes Then 'ha a nem-re kattintott kilépek
         MsgBox "Akkor kilépek.", , "Mégsem"
         Exit Sub
  End If
@@ -72,13 +87,13 @@ Sub Emailbe_ICk()
 ' IC-k lista Email generálása
 ' Copilot szerkesztette
 
-    Dim OutApp As Object
-    Dim OutMail As Object
-    Dim editor As Object
-    Dim rg As Range
-    Dim kerdes As Integer
-    Dim lang As Long 'Windows nyelv keresése
-    Dim wordNo As String 'Windows nyelv keresése
+Dim OutApp As Object
+Dim OutMail As Object
+Dim editor As Object
+Dim rg As Range
+Dim kerdes As Integer
+Dim lang As Long 'Windows nyelv keresése
+Dim wordNo As String 'Windows nyelv keresése
 
 lang = Application.LanguageSettings.LanguageID(msoLanguageIDUI) 'Nyelvi kódtábla számát adja vissza
 
@@ -92,7 +107,7 @@ lang = Application.LanguageSettings.LanguageID(msoLanguageIDUI) 'Nyelvi kódtáb
 
 kerdes = MsgBox(Space(15) & "Létrehozok egy EMAIL-t," & vbCrLf & "beszúrom a táblázatot és megadom a Címzeteket is! " & vbCrLf & "Mehet  vagy a  " & wordNo & "  gombbal kilépsz??", vbYesNo + vbQuestion, "Adatok szűrése")
 
- If kerdes <> vbYes Then 'ha nemre kattintott kilépek
+ If kerdes <> vbYes Then 'ha a nem-re kattintott kilépek
         MsgBox "Akkor kilépek.", , "Mégsem"
         Exit Sub
  End If
