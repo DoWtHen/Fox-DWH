@@ -54,7 +54,7 @@ SzurtUtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella sz
         .WrapText = True ' sortörés a cellaszövegben
     End With
     
-    ' minden oszlop legyen Autofit + 10 pont széles
+    ' minden oszlop legyen Autofit + 3 pont széles
     For i = 1 To 9
         Columns(i).AutoFit
         Columns(i).ColumnWidth = Columns(i).ColumnWidth + 3
