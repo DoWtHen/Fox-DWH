@@ -1,4 +1,7 @@
 # Fox-DWH Excel:
+<img width="1308" height="298" alt="ikonkepek" src="https://github.com/user-attachments/assets/b5f88e6d-ceff-4586-a8ec-261008ee579f" />
+
+
 ## Excel Personal kódok:
 
 ```vba
