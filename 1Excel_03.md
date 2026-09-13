@@ -1,152 +1,274 @@
 ```vba
 
 '====================================
-'     PROGRAMOZOTT IC-k KÉPLETEK
+'           SEGÉD KÉPLETEK
 '              FoxConn
 '====================================
 
-Sub Programozott_ICk()
-' DoWtHen Makró 2026.07.20
+Sub Toltheto_Tarhelyek()
+' DoWtHen Makró 2026.04.22
 ' Foxconn segédlet
-' IC-k lista szűrése programozott SU számokra (nem _00 végű SU számok)
-' Copilot szerkesztette
 
-Dim UtolsoA As Long
-Dim SzurtUtolsoA As Long
-Dim ListaUtolsoA As Long
-Dim i As Long 'oszlopszélesség változója
 Dim kerdes As Integer
-Dim lang As Long 'Windows nyelv keresése
-Dim wordYes As String 'Windows nyelv keresése
 
-lang = Application.LanguageSettings.LanguageID(msoLanguageIDUI) 'Nyelvi kódtábla számát adja vissza
+kerdes = MsgBox("Képleteket írok a H1 cellától!" & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adat másolása")
 
-    'Kódtáblához igazodva írja ki az Igen szót
-    Select Case lang
-        Case 1033: wordYes = "Yes"
-        Case 1038: wordYes = "Igen"
-        Case 1031: wordYes = "Ja"
-        Case Else: wordYes = "Yes" 'alapértelmezett
-    End Select
+If kerdes = vbYes Then
+    Range("H1") = "#"
+    Range("I1") = "Tárhely"
+    Range("J1") = "Foglalt tárhely"
+    Range("K1") = "Üres tárhely"
+    Range("I2") = 0
+    Range("H2,H3") = "MP"
+    'Range("I3").FormulaLocal = "=ÖSSZEFŰZ(I2;""-A"")"
+    'Az ősszefűz függvény angolul CONCATENATE, a fűz függvény CONCAT
+    Range("I3") = "=CONCAT(I2,""-A"")"
+    'Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("J2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
 
-kerdes = MsgBox("Ez a makró a Programozott IC-k munkalapot szűri le." & vbCrLf & "Az  " & wordYes & "-re kattintva kezdi a formázást." & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adatok szűrése")
+    'Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
+    Range("J3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
+    
+    'Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("K2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
+    
+    'Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
+    Range("K3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
+Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
 
- If kerdes <> vbYes Then 'ha a nem-re kattintott kilépek
-        MsgBox "Akkor kilépek.", , "Mégsem"
-        Exit Sub
- End If
-
-UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
-
-On Error Resume Next
-    'Feltételes szűrés
-    Range("I1").Select
-    ActiveSheet.Range("$A$1:$I$" & UtolsoA).AutoFilter Field:=9, Criteria1:="<>*_00", Operator:=xlAnd
-        
-SzurtUtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
-
-    Range("A1:I" & SzurtUtolsoA).Select
-    Selection.Copy
-    Sheets.Add After:=ActiveSheet
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-        :=False, Transpose:=False
-        
-    'Első sor sortörés és magasság beállítása
-    With Rows(1) 'az első sor kiválasztása
-        .RowHeight = 45 'magasság állítás
-        .WrapText = True 'sortörés a cellaszövegben
+    Range("H1:K3").Select
+    With Selection.Interior
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = -0.149998474074526
+        .PatternTintAndShade = 0
+    End With
+    Range("I2").Select
+    With Selection.Interior
+        .Pattern = xlNone
+    End With
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
+    
+    Range("H1:K3").Select
+    With Selection
+        .HorizontalAlignment = xlGeneral
+        .VerticalAlignment = xlCenter
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+    End With
+    Range("H1:K1").Select
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = True
     End With
     
-    'Minden oszlop legyen Autofit + 10 pont széles
-    For i = 1 To 9
-        Columns(i).AutoFit
-        Columns(i).ColumnWidth = Columns(i).ColumnWidth + 3
-    Next i
-    'Újra beállítjuk az első sor magasságát
-    'Első sor legyen Autofit + 5 pont magas
-    Rows(1).AutoFit
-    Rows(1).RowHeight = Rows(1).RowHeight + 5
-    
-    'H és I oszlop legyen középre rendezve
-    With Columns("H:I") 'a H és I oszlop kiválasztása
-        .HorizontalAlignment = xlCenter 'szöveg rendezés középre
-    End With
-    
-ListaUtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
-    
-    'A legegyszerűbb teljes rácsozás parancs !!!
-    Range("A1:I" & ListaUtolsoA).Borders.LineStyle = xlContinuous
-    Range("A1:I" & ListaUtolsoA).Borders.Weight = xlThin
-    
-    Range("A1").Select
-Application.Wait (Now + TimeValue("0:00:02")) 'Egy kis szünet
-    Call Emailbe_ICk
-    
+    Range("K8") = "Teljesen Üres Tárhelyek"
+    Range("I2").Select
+Else
+    MsgBox "Akkor kilépek"
+End If
 End Sub
 
 
-Sub Emailbe_ICk()
-' DoWtHen Makró 2026.07.20
+Function SzinSzamolas(rng As Range, colorCell As Range) As Long
+' DoWtHen Makró 2026.05.30
 ' Foxconn segédlet
-' IC-k lista Email generálása
-' Copilot szerkesztette
+' Szín számoló függvény
+' pl.: beírható a cellába is ha a függvény elérhető
+' =SzinSzamolas(C2:C23  ;                    C1)
+'            tartomány  ;  a színt tartalmazó cella amit számolni kell
+' Copilot segítséggel
 
-Dim OutApp As Object
-Dim OutMail As Object
-Dim editor As Object
-Dim rg As Range
+    Dim c As Range
+    Dim cnt As Long
+    
+    For Each c In rng
+        If c.Interior.Color = colorCell.Interior.Color Then
+            cnt = cnt + 1
+        End If
+    Next c
+    SzinSzamolas = cnt
+End Function
+
+
+Sub Aranyok()
+' DoWtHen Makró 2026.05.30
+' Foxconn segédlet
+' Arányszámítás a WO kittingeléshez
+' 2026.07.02 -> Flexibilis bárhová helyezhető (még mindig az A és C oszlopból számol)
+
+Dim UtolsoA As Long
 Dim kerdes As Integer
-Dim lang As Long 'Windows nyelv keresése
-Dim wordNo As String 'Windows nyelv keresése
+Dim AktualCella As Range
+Dim destRange As Range
+Dim Kijeloles As Range
+ 
+UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
 
-lang = Application.LanguageSettings.LanguageID(msoLanguageIDUI) 'Nyelvi kódtábla számát adja vissza
+Set AktualCella = ActiveCell 'a kijelölt cella ahova az Arányokat beírja
 
-    'Kódtáblához igazodva írja ki a Nem szót
-    Select Case lang
-        Case 1033: wordNo = "No"
-        Case 1038: wordNo = "Nem"
-        Case 1031: wordNo = "Nein"
-        Case Else: wordNo = "No" 'alapértelmezett
-    End Select
+kerdes = MsgBox("A ""kitting lista"" munkalapon összeszámolja," & vbCrLf & "hogy a WO-ra hány %-nyi" & vbCrLf & "alapanyag van kiadva, könyvelve." & vbCrLf & vbCrLf & vbCrLf & "Képleteket írok a(z)  " & Cells(ActiveCell.Row, ActiveCell.Column).Address(False, False) & "  cellától!" & vbCrLf & "Mehet??" & Space(15) & "====", vbYesNo + vbQuestion, "Adat másolása  Arányok")
 
-kerdes = MsgBox(Space(15) & "Létrehozok egy EMAIL-t," & vbCrLf & "beszúrom a táblázatot és megadom a Címzeteket is! " & vbCrLf & "Mehet  vagy a  " & wordNo & "  gombbal kilépsz??", vbYesNo + vbQuestion, "Adatok szűrése")
-
- If kerdes <> vbYes Then 'ha a nem-re kattintott kilépek
-        MsgBox "Akkor kilépek.", , "Mégsem"
+ If kerdes <> vbYes Then 'ha nem igen kilépek
+        MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
         Exit Sub
  End If
-
-    'Másolandó tartomány
-    Set rg = ActiveSheet.UsedRange
-    rg.Copy
-
-    'Outlook email létrehozása
-    Set OutApp = CreateObject("Outlook.Application")
-    Set OutMail = OutApp.CreateItem(0)
-
-    'Címzettek
-    OutMail.To = "valaki@ceg.hu; valaki22@ceg.hu"
     
-    'Email tárgy
-    OutMail.Subject = "Programozott IC-k listája  " & Format(Date, "yyyy.mm.dd")
+    AktualCella.Value = "Össz.sor"
+    'Range("G2").FormulaLocal = "=DARAB2(A2:A" & UtolsoA & ")" 'magyar verzió
+    ActiveCell.Offset(1, 0).Formula = "=COUNTA(A2:A" & UtolsoA & ")"  'egy sorral lejebb
 
-    'Email megnyitása
-    OutMail.Display
+    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    ActiveCell.Offset(0, 0) = "Zöld"  'ugyan oda
+    'Range("H2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";H1)" 'magyar verzió
+    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("H1"))  'egy sorral lejebb  ez csak eredményt ír be
+    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0))  'egy sorral lejebb  ez csak eredményt ír be
+ 
+    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 65535
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    ActiveCell.Offset(0, 0) = "Sárga"  'ugyan oda
+    'Range("I2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";I1)" 'magyar verzi
+    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("I1")) 'egy sorral lejebb  ez csak eredményt ír be
+    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0)) 'egy sorral lejebb  ez csak eredményt ír be
+    
+    ActiveCell.Offset(0, 1) = "Üres"  'egy oszloppal jobbra
+    'ActiveCell.Offset(1, 1) = "=G2-(H2+I2)"  'egy sorral lejebb és egy oszloppal jobbra
+    ActiveCell.Offset(1, 1).Formula = "=" & AktualCella.Offset(1, 0).Address(False, False) & "-(" & AktualCella.Offset(1, 1).Address(False, False) & "+" & AktualCella.Offset(1, 2).Address(False, False) & ")"  'kivonás és összeadás eltolt cellákkal
 
-    'Várunk, amíg a WordEditor létrejön
-    Do While OutMail.GetInspector.WordEditor Is Nothing
-        DoEvents
-    Loop
+Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
+    
+    Application.CutCopyMode = False
+    ActiveCell.Offset(2, -1).Select  'két sorral lejebb és egy oszloppal balra
+    Selection.Style = "Percent"
 
-    'WordEditor elérése
-    Set editor = OutMail.GetInspector.WordEditor.Application.Selection
+    ActiveCell.Formula = "=" & ActiveCell.Offset(-1, 0).Address(False, False) & "/" & AktualCella.Offset(1, 0).Address(True, True)  'osztás eltolt cellákkal
+    
+Set destRange = Range(ActiveCell, ActiveCell.Offset(0, 2)) 'tartomány megadása aktiv cellához képest
 
-    '1) Szöveg beírása
-    editor.TypeText "Sziasztok." & vbCrLf & vbCrLf
-    editor.TypeText "Küldöm a programozott IC-k táblázatát." & vbCrLf & vbCrLf
+    ActiveCell.AutoFill Destination:=destRange, Type:=xlFillDefault 'aktív cellától a megadott tartományig kijelölés
+    AktualCella.Select
+    
+Set Kijeloles = Range(AktualCella, ActiveCell.Offset(2, 3)) 'tartomány megadása aktiv cellához képest
+    
+    Kijeloles.Select  'középre igazítás
+    With Selection
+        .HorizontalAlignment = xlCenter
+    End With
+    AktualCella.Select
+End Sub
 
-    '2) Táblázat beillesztése
-    editor.Paste
+
+Sub Munkalapok_Atnevezese_Munkanapokra()
+' DoWtHen Makró 2026.08.01 eredeti fájl
+' DoWtHen Makró 2026.09.08
+' Foxconn segédlet
+' Munkalapok átnevezése csak munkanapokra
+' Copilot szerkesztette
+
+    Dim ws As Worksheet
+    Dim KezdoDatum As Date
+    Dim BeirtSzoveg As String
+    Dim parts() As String
+    Dim y As Long, m As Long, d As Long
+    Dim i As Long
+
+    '--- dátum bekérése ---
+    BeirtSzoveg = InputBox( _
+        "A ""Műszakjelentés"" munkafüzet MINDEN lapjának átnevezése MUNKANAPOKRA!" & vbCrLf & vbCrLf & _
+        "Írd be a kezdő dátumot (pl. 2026.08.01)." & vbCrLf & _
+        "Ez lesz az első munkalap neve.", _
+        "Átnevezés – Munkanapok", Format(Date, "yyyy.mm.dd"))
+
+    If BeirtSzoveg = "" Then
+        MsgBox "Nem adtál meg dátumot. Kilépek.", vbInformation, "Mégsem"
+        Exit Sub
+    End If
+
+    '--- yyyy.mm.dd feldarabolása ---
+    parts = Split(BeirtSzoveg, ".")
+    If UBound(parts) <> 2 Then
+        MsgBox "Érvénytelen formátum!" & vbCrLf & "Használd így: 2026.08.01", vbCritical
+        Exit Sub
+    End If
+
+    '--- év, hónap, nap számokká alakítása ---
+    y = CLng(parts(0))
+    m = CLng(parts(1))
+    d = CLng(parts(2))
+
+    '--- dátum összeállítása ---
+    On Error Resume Next
+    KezdoDatum = DateSerial(y, m, d)
+    If Err.Number <> 0 Then
+        MsgBox "Érvénytelen dátumérték!", vbCritical
+        Err.Clear
+        Exit Sub
+    End If
+    On Error GoTo 0
+
+    '--- munkalapok átnevezése csak munkanapokra ---
+    Dim AktDatum As Date
+    AktDatum = KezdoDatum
+
+    For i = 1 To ActiveWorkbook.Worksheets.Count
+        '--- ha hétvége, léptess tovább hétfőre ---
+        Do While Weekday(AktDatum, vbMonday) > 5   ' 6=szombat, 7=vasárnap
+            AktDatum = AktDatum + 1
+        Loop
+
+        Set ws = ActiveWorkbook.Worksheets(i)
+
+        On Error Resume Next
+        ws.Name = Format(AktDatum, "yyyy.mm.dd")
+
+        If Err.Number <> 0 Then
+            MsgBox "Nem sikerült átnevezni a(z) " & ws.Name & _
+                   " lapot › " & Format(AktDatum, "yyyy.mm.dd")
+            Err.Clear
+        End If
+        On Error GoTo 0
+
+        '--- következő munkanap ---
+        AktDatum = AktDatum + 1
+    Next i
+
+    MsgBox "Kész! A munkalapok átnevezése munkanapokra megtörtént.", vbInformation
 End Sub
 
 ```
