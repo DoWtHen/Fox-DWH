@@ -1,88 +1,101 @@
-```python
-Sub Toltheto_Tarhelyek()
-' DoWtHen Makró 2026.04.22
-' Foxconn segédlet
+```vba
 
-Dim kerdes As Integer
+'==================================
+'            DoWtHen
 
-kerdes = MsgBox("Képleteket írok a H1 cellától!" & vbCrLf & "Mehet??", vbYesNo + vbQuestion, "Adat másolása")
+' === PRÓBA FÜGGVÉNYEK, MAKRÓK ===
+'==================================
+Public Highlighter As clsHighlight
 
-If kerdes = vbYes Then
-    Range("H1") = "#"
-    Range("I1") = "Tárhely"
-    Range("J1") = "Foglalt tárhely"
-    Range("K1") = "Üres tárhely"
-    Range("I2") = 0
-    Range("H2,H3") = "MP"
-    'Range("I3").FormulaLocal = "=ÖSSZEFŰZ(I2;""-A"")"
-    'Az ősszefűz függvény angolul CONCATENATE, a fűz függvény CONCAT
-    Range("I3") = "=CONCAT(I2,""-A"")"
-    'Range("J2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("J2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
+Sub ToggleRowHighlight()
+' DoWtHen Makró 2026.04.13
+' Sorok kiemelése sárga színnel kapcsoló makró része
+' Copilot szerkesztette
 
-    'Range("J3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;2;HAMIS);""nincs ilyen tárhely"")"
-    Range("J3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,2,FALSE),""nincs ilyen tárhely"")"
-    
-    'Range("K2").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H2;I2);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
-    Range("K2") = "=IFERROR(VLOOKUP(CONCAT(H2,I2),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
-    
-    'Range("K3").FormulaLocal = "=HAHIBA(FKERES(ÖSSZEFŰZ(H3;I3);$A$2:$C$1000;3;HAMIS);""nincs ilyen tárhely"")"
-    Range("K3") = "=IFERROR(VLOOKUP(CONCAT(H3,I3),$A$2:$C$1000,3,FALSE),""nincs ilyen tárhely"")"
-Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
+    'Ha még nincs példány, hozzuk létre
+    If Highlighter Is Nothing Then
+        Set Highlighter = New clsHighlight
+        Set Highlighter.App = Application
+        Highlighter.HighlightEnabled = False 'induláskor legyen kikapcsolva, most úgyis váltunk
+    End If
 
-    Range("H1:K3").Select
-    With Selection.Interior
-        .PatternColorIndex = xlAutomatic
-        .ThemeColor = xlThemeColorDark1
-        .TintAndShade = -0.149998474074526
-        .PatternTintAndShade = 0
-    End With
-    Range("I2").Select
-    With Selection.Interior
-        .Pattern = xlNone
-    End With
-    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
-    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
-    With Selection.Borders(xlEdgeLeft)
-        .LineStyle = xlContinuous
-        .Weight = xlMedium
-    End With
-    With Selection.Borders(xlEdgeTop)
-        .LineStyle = xlContinuous
-        .Weight = xlMedium
-    End With
-    With Selection.Borders(xlEdgeBottom)
-        .LineStyle = xlContinuous
-        .Weight = xlMedium
-    End With
-    With Selection.Borders(xlEdgeRight)
-        .LineStyle = xlContinuous
-        .Weight = xlMedium
-    End With
-    Selection.Borders(xlInsideVertical).LineStyle = xlNone
-    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
-Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
-    
-    Range("H1:K3").Select
-    With Selection
-        .HorizontalAlignment = xlGeneral
-        .VerticalAlignment = xlCenter
-    End With
-    With Selection
-        .HorizontalAlignment = xlCenter
-        .VerticalAlignment = xlCenter
-    End With
-    Range("H1:K1").Select
-    With Selection
-        .HorizontalAlignment = xlCenter
-        .VerticalAlignment = xlCenter
-        .WrapText = True
-    End With
-    
-    Range("K8") = "Teljesen Üres Tárhelyek"
-    Range("I2").Select
-Else
-    MsgBox "Akkor kilépek"
-End If
+    Highlighter.HighlightEnabled = Not Highlighter.HighlightEnabled
+
+    If Highlighter.HighlightEnabled Then
+        MsgBox "Sor kiemelés: BEKAPCSOLVA", vbInformation
+    Else
+        MsgBox "Sor kiemelés: KIKAPCSOLVA", vbExclamation
+    End If
 End Sub
+
+
+Function Toldalek(ertek As Variant) As String
+' DoWtHen makró
+' 2026.08.18
+' Toldalék hozzáadása számhoz dátumhoz függvény
+' A képlet után Copolit szerkesztette
+
+    Dim nap As Long
+    Dim utolso2 As Long
+    Dim szoveg As String
+
+    ' Ha dátum
+    If IsDate(ertek) Then
+        szoveg = Format(ertek, "yyyy.mm.dd")
+        nap = Day(ertek)
+        utolso2 = nap Mod 100
+
+    ' Ha szám
+    ElseIf IsNumeric(ertek) Then
+        szoveg = CStr(ertek)
+        utolso2 = CLng(ertek) Mod 100
+
+    Else
+        Toldalek = "#HIBA"
+        Exit Function
+    End If
+
+    ' Toldalék meghatározása
+    If utolso2 = 12 Or utolso2 = 22 Then
+        Toldalek = szoveg & ".-e"
+        Exit Function
+    End If
+
+    Select Case utolso2
+        Case 2, 3, 6, 8, 13, 16, 18, 20, 23, 26, 28, 30
+            Toldalek = szoveg & ".-a"
+        Case Else
+            Toldalek = szoveg & ".-e"
+    End Select
+End Function
+
+
+Sub Minden_Tagolas_Osszecsuk()
+' DoWtHen makró
+' 2026.08.18
+' Tagolás Sorok összecsukása
+
+    Dim r As Range
+
+    For Each r In ActiveSheet.UsedRange.Rows 'a ciklus minden soron ellenőrzi hogy van-e ott Tagolás szum kocka -/+
+        ' Csak olyan sor, ahol ténylegesen summary (itt te döntöd el: pl. 1-es szint)
+        If r.OutlineLevel = 1 Then
+            On Error Resume Next
+            r.ShowDetail = False
+            On Error GoTo 0
+        End If
+    Next r
+        Range("D37").Select
+End Sub
+
+
+Sub Tagolas_Kinyit()
+' DoWtHen makró
+' 2026.08.18
+' Tagolás Sorok kinyitása
+
+    ActiveSheet.Outline.ShowLevels RowLevels:=8 'bármilyen szám ami nagyobb mint a táblázat tagok száma
+    Range("F2").Select
+End Sub
+
 ```
