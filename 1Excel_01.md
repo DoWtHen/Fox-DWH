@@ -1,6 +1,6 @@
 # Fox-DWH Excel:
-<img width="1308" height="298" alt="ikonkepek" src="https://github.com/user-attachments/assets/b5f88e6d-ceff-4586-a8ec-261008ee579f" />
 
+<img width="2565" height="599" alt="ikonképek" src="https://github.com/user-attachments/assets/ca81c6fd-152d-44a4-b565-15f5aeb09f07" />
 
 ## Excel Personal kódok:
 
