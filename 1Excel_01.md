@@ -5,27 +5,11 @@
 ## Excel Personal kódok:
 
 ```vba
-Sub AutoSzurok_KI_BE()
-' DoWtHen Makró 2026.07.17
-' Auto Szűrők ki-be kapcsolása
+'=====================================
+'               DoWtHen
 
-    Dim ws As Worksheet
-    Set ws = ActiveSheet
-
-    ' Ha van szűrés, akkor törli
-    If ws.FilterMode Then
-        ws.ShowAllData
-    End If
-
-    ' Ha nincs AutoFilter a lapon, akkor bekapcsolja
-    If ws.AutoFilter Is Nothing Then
-        ' Itt állítsd be, melyik soron legyen az AutoFilter
-        ws.Range("A1").AutoFilter
-    End If
-End Sub
-```
-
-```vba
+' === PERSONAL FÜGGVÉNYEK, MAKRÓK ===
+'=====================================
 Option Explicit
 
 Sub info()
@@ -50,15 +34,19 @@ MsgBox Space(36) & "Infók a makrókról 1.rész:" & vbCrLf & Elso_cella & vbCrL
 ScrollLefele & vbCrLf & MindenLap_Legfelulre & vbCrLf & AutoSzurok_KI_BE & vbCrLf & Kozepre_Igazit & vbCrLf & ZoomFel & vbCrLf & Zoom100 & vbCrLf & ZoomLe & vbCrLf & Space(90) & Aktualis, , "Információk"
 End Sub
 
+
 Sub info_2()
 ' DoWtHen Makró 2025.07.15
 
-Dim Aktualis, Biztonsagi_Mentes
+Dim Aktualis, Biztonsagi_Mentes, Megjegyzes_ertekExtra, Megjegyzes_kepletExtra
 
 Biztonsagi_Mentes = "* Biztonsági Mentés:  Egy megadott mappába létrehoz a fájlról egy másolatot dátum, idő hozzáadásával a fájlnévhez," & vbCrLf & "a kiterjesztést az eredeti fájlból adja hozzá."
-Aktualis = "2025.07.15"
+Megjegyzes_ertekExtra = "* Megjegyzés ÉRTÉK: Egy kiválasztott cella ÉRTÉKÉT megjegyzésként szúrja be egy másik kiválasztott cellába."
+Megjegyzes_kepletExtra = "* Megjegyzés KÉPLET: Egy kiválasztott cella KÉPLETÉT megjegyzésként szúrja be egy másik kiválasztott cellába."
 
-MsgBox Space(36) & "Infók a makrókról 2.rész:" & vbCrLf & Biztonsagi_Mentes & vbCrLf & Space(90) & Aktualis, , "Információk"
+Aktualis = "2026.08.17"
+
+MsgBox Space(36) & "Infók a makrókról 2.rész:" & vbCrLf & Biztonsagi_Mentes & vbCrLf & Megjegyzes_ertekExtra & vbCrLf & Megjegyzes_kepletExtra & vbCrLf & Space(90) & Aktualis, , "Információk"
 End Sub
 
 
@@ -94,13 +82,29 @@ End Sub
 
 
 Sub AutoSzurok_KI_BE()
-' DoWtHen Makró 2024.12.20
+' DoWtHen Makró 2026.07.17
 ' Auto Szűrők ki-be kapcsolása
 
-    If ActiveSheet.FilterMode Then
-        ActiveSheet.ShowAllData
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+
+    'Ha van szűrés, akkor törli
+    If ws.FilterMode Then
+        ws.ShowAllData
     End If
+
+    'Ha nincs AutoFilter a lapon, akkor bekapcsolja
+    If ws.AutoFilter Is Nothing Then
+        'Itt állítsd be, melyik soron legyen az AutoFilter
+        ws.Range("A1").AutoFilter
+    End If
+
+' DoWtHen Makró 2026.04.20
+'    If ActiveSheet.FilterMode Then
+'        ActiveSheet.ShowAllData
+'    End If
     
+' DoWtHen Makró 2024.12.20
 'On Error GoTo Hibasor
 '    Range("A1").Select
 '    Selection.AutoFilter  'ki-be kapcsolja a szűrőket
@@ -261,108 +265,111 @@ On Error GoTo Hibasor
 Hibasor:
 MsgBox "Nincs ilyen mappa:  " & menteshelye & vbCrLf & "Hozd létre a mappát vagy változtasd meg a makróban a mappa elérési útvonalat.", vbCritical, "Nincs Mentési Mappa"
 End Sub
-```
-
-```vba
-Function SzinSzamolas(rng As Range, colorCell As Range) As Long
-' DoWtHen Makró 2026.05.30
-' Foxconn segédlet
-' Szín számoló függvény
-' pl.: beírható a cellába is ha a függvény elérhető
-' =SzinSzamolas(C2:C23  ;                    C1)
-'            tartomány  ;  a színt tartalmazó cella amit számolni kell
-' Copilot segítséggel
-
-    Dim c As Range
-    Dim cnt As Long
-    
-    For Each c In rng
-        If c.Interior.Color = colorCell.Interior.Color Then
-            cnt = cnt + 1
-        End If
-    Next c
-    SzinSzamolas = cnt
-End Function
 
 
-Sub Aranyok()
-' DoWtHen Makró 2026.05.30
-' Foxconn segédlet
-' Arányszámítás a WO kittingeléshez
-' 2026.07.02 -> Flexibilis bárhová helyezhető (még mindig az A és C oszlopból számol)
+Sub Megjegyzes_ertekExtra()
+' DoWtHen makró
+' Ez a makró egy kiválasztott cella ÉRTÉKÉT megjegyzésként szúrja be egy másik kiválasztott cellába.
+' Eredeti verzió: 2021.06.06
+' 2026.08.17
+' Copolit segítségével
 
-Dim UtolsoA As Long
-Dim kerdes As Integer
-Dim AktualCella As Range
-Dim destRange As Range
-Dim Kijeloles As Range
- 
-UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
+    Dim LapNeve As String
+    Dim MasolandoCell As Range
+    Dim HovaCell As Range
+    Dim Megjegyzes As String
 
-Set AktualCella = ActiveCell 'a kijelölt cella ahova az Arányokat beírja
+    On Error GoTo hiba
+
+    LapNeve = ActiveSheet.Name
+
+    ' --- CELLAVÁLASZTÁS EGÉRREL ---
+    Set MasolandoCell = Application.InputBox( _
+        Prompt:="Egér kattintással válaszd ki azt a cellát," & vbCrLf & "amelynek az ÉRTÉKÉT megjegyzésként átmásoljuk.", _
+        Title:="Cellaválasztás", Type:=8)
+
+    ' Mégsem gomb › Nothing › kilépés
+    If MasolandoCell Is Nothing Then Exit Sub
+
+    Megjegyzes = MasolandoCell.Value
+
+    MsgBox LapNeve & " munkalapon" & vbCrLf & _
+           "Ez lesz a megjegyzésben:" & vbCrLf & Megjegyzes
+
+    ' --- HOVA KERÜLJÖN A MEGJEGYZÉS? ---
+    Set HovaCell = Application.InputBox( _
+        Prompt:="Egér kattintással válaszd ki azt a cellát, AHOVÁ a megjegyzést tesszük.", _
+        Title:="Cellaválasztás", Type:=8)
+
+    ' Mégsem gomb › Nothing › kilépés
+    If HovaCell Is Nothing Then Exit Sub
+
+    HovaCell.AddComment
+    'HovaCell.Comment.Visible = True 'mindig látható a megjegyzés
+    HovaCell.Comment.Text Text:="Az átmásolt (" & MasolandoCell.Address(False, False) & _
+        ") cella értéke:" & vbCrLf & Megjegyzes
+    Exit Sub
+
+hiba:
+     ' Csak akkor fusson le, ha tényleg megjegyzés van a cellában
+    If Err.Number = 1004 Then
+    MsgBox "Már van megjegyzés a cellában!" & vbCrLf & _
+           "Nem írom felül, töröld előtte.", vbOKOnly + vbCritical, "Hiba"
+    End If
+End Sub
 
 
-kerdes = MsgBox("Képleteket írok a(z)  " & Cells(ActiveCell.Row, ActiveCell.Column).Address(False, False) & "  cellától!" & vbCrLf & "Mehet??" & Space(15) & "====", vbYesNo + vbQuestion, "Adat másolása")
+Sub Megjegyzes_kepletExtra()
+' DoWtHen makró
+' Ez a makró egy kiválasztott cella KÉPLETÉT megjegyzésként szúrja be egy másik kiválasztott cellába.
+' Eredeti verzió: 2021.06.06
+' 2026.08.17
+' Copolit segítségével
 
- If kerdes <> vbYes Then 'ha nem igen kilépek
-        MsgBox "Akkor kilépek.", , "Mégsem"
-        Exit Sub
- End If
-    
-    AktualCella.Value = "Össz.sor"
-    'Range("G2").FormulaLocal = "=DARAB2(A2:A" & UtolsoA & ")" 'magyar verzió
-    ActiveCell.Offset(1, 0).Formula = "=COUNTA(A2:A" & UtolsoA & ")"  'egy sorral lejebb
+    Dim LapNeve As String
+    Dim MasolandoCell As Range
+    Dim HovaCell As Range
+    Dim Megjegyzes As String
 
-    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
-    With Selection.Interior
-        .Pattern = xlSolid
-        .PatternColorIndex = xlAutomatic
-        .Color = 5287936
-        .TintAndShade = 0
-        .PatternTintAndShade = 0
-    End With
-    ActiveCell.Offset(0, 0) = "Zöld"  'ugyan oda
-    'Range("H2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";H1)" 'magyar verzió
-    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("H1"))  'egy sorral lejebb  ez csak eredményt ír be
-    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0))  'egy sorral lejebb  ez csak eredményt ír be
- 
-    ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
-    With Selection.Interior
-        .Pattern = xlSolid
-        .PatternColorIndex = xlAutomatic
-        .Color = 65535
-        .TintAndShade = 0
-        .PatternTintAndShade = 0
-    End With
-    ActiveCell.Offset(0, 0) = "Sárga"  'ugyan oda
-    'Range("I2").FormulaLocal = "=SzinSzamolas(C2:C" & UtolsoA & ";I1)" 'magyar verzi
-    'ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), Range("I1")) 'egy sorral lejebb  ez csak eredményt ír be
-    ActiveCell.Offset(1, 0).Value = SzinSzamolas(Range("C2:C" & UtolsoA), ActiveCell.Offset(0, 0)) 'egy sorral lejebb  ez csak eredményt ír be
-    
-    ActiveCell.Offset(0, 1) = "Üres"  'egy oszloppal jobbra
-    'ActiveCell.Offset(1, 1) = "=G2-(H2+I2)"  'egy sorral lejebb és egy oszloppal jobbra
-    ActiveCell.Offset(1, 1).Formula = "=" & AktualCella.Offset(1, 0).Address(False, False) & "-(" & AktualCella.Offset(1, 1).Address(False, False) & "+" & AktualCella.Offset(1, 2).Address(False, False) & ")"  'kivonás és összeadás eltolt cellákkal
+    On Error GoTo hiba
 
-Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
-    
-    Application.CutCopyMode = False
-    ActiveCell.Offset(2, -1).Select  'két sorral lejebb és egy oszloppal balra
-    Selection.Style = "Percent"
+    LapNeve = ActiveSheet.Name
 
-    ActiveCell.Formula = "=" & ActiveCell.Offset(-1, 0).Address(False, False) & "/" & AktualCella.Offset(1, 0).Address(True, True)  'osztás eltolt cellákkal
-    
-Set destRange = Range(ActiveCell, ActiveCell.Offset(0, 2)) 'tartomány megadása aktiv cellához képest
+    ' --- KÉPLETET TARTALMAZÓ CELLAVÁLASZTÁS EGÉRREL ---
+    Set MasolandoCell = Application.InputBox( _
+        Prompt:="Egér kattintással válaszd ki azt a cellát," & vbCrLf & "amelynek a KÉPLETÉT megjegyzésként átmásoljuk.", _
+        Title:="Cellaválasztás", Type:=8)
 
-    ActiveCell.AutoFill Destination:=destRange, Type:=xlFillDefault 'aktív cellától a megadott tartományig kijelölés
-    AktualCella.Select
-    
-Set Kijeloles = Range(AktualCella, ActiveCell.Offset(2, 3)) 'tartomány megadása aktiv cellához képest
-    
-    Kijeloles.Select  'középre igazítás
-    With Selection
-        .HorizontalAlignment = xlCenter
-    End With
-    AktualCella.Select
+    ' Mégsem gomb › Nothing › kilépés
+    If MasolandoCell Is Nothing Then Exit Sub
+
+    ' A cella képletét kérjük le
+    Megjegyzes = MasolandoCell.Formula
+
+    MsgBox LapNeve & " munkalapon" & vbCrLf & _
+           "Ez lesz a megjegyzésben:" & vbCrLf & Megjegyzes
+
+    ' --- HOVA KERÜLJÖN A MEGJEGYZÉS? ---
+    Set HovaCell = Application.InputBox( _
+        Prompt:="Egér kattintással válaszd ki azt a cellát, AHOVÁ a megjegyzést tesszük.", _
+        Title:="Cellaválasztás", Type:=8)
+
+    ' Mégsem gomb › Nothing › kilépés
+    If HovaCell Is Nothing Then Exit Sub
+
+    ' Megjegyzés beszúrása
+    HovaCell.AddComment
+    'HovaCell.Comment.Visible = True 'mindig látható a megjegyzés
+    HovaCell.Comment.Text Text:="Az átmásolt (" & MasolandoCell.Address(False, False) & _
+        ") cella képlete:" & vbCrLf & Megjegyzes
+    Exit Sub
+
+hiba:
+     ' Csak akkor fusson le, ha tényleg megjegyzés van a cellában
+    If Err.Number = 1004 Then
+    MsgBox "Már van megjegyzés a cellában!" & vbCrLf & _
+           "Nem írom felül, töröld előtte.", vbOKOnly + vbCritical, "Hiba"
+    End If
 End Sub
 
 ```
