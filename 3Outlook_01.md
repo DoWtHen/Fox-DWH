@@ -2,7 +2,9 @@
 ## Outlook makró a levelek áthelyezésére:
 
 ```vba
+
 Sub Kijelolt_Emailek_Athelyezese_Tallozas()
+' DoWtHen Makró 2026.05.01
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT MAPPA TALLÓZÁS ABLAKKAL
     
     On Error GoTo ErrHandler
@@ -10,6 +12,11 @@ Sub Kijelolt_Emailek_Athelyezese_Tallozas()
     Dim ns As Outlook.NameSpace
     Dim destFolder As Outlook.MAPIFolder
     Dim itm As Object
+
+  If MsgBox("A kijelölt levelek áthelyezése Tallózás ablakkal." & vbCrLf & "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
+    MsgBox "Akkor kilépek."
+    Exit Sub
+  End If
 
     Set ns = Application.GetNamespace("MAPI")
 
@@ -31,7 +38,7 @@ Sub Kijelolt_Emailek_Athelyezese_Tallozas()
         End If
     Next itm
 
-    MsgBox "Áthelyezés kész.", vbInformation
+    MsgBox "Áthelyezés kész!", vbInformation
     Exit Sub
 
 ErrHandler:
@@ -40,6 +47,7 @@ End Sub
 
 
 Sub Kijelolt_Emailek_Athelyezese()
+' DoWtHen Makró 2026.05.01
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT
 
     On Error GoTo ErrHandler
@@ -47,6 +55,11 @@ Sub Kijelolt_Emailek_Athelyezese()
     Dim ns As Outlook.NameSpace
     Dim destFolder As Outlook.MAPIFolder
     Dim itm As Object
+
+  If MsgBox("A kijelölt levelek áthelyezése az Archívum mappába." & vbCrLf & "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
+    MsgBox "Akkor kilépek."
+    Exit Sub
+  End If
 
     Set ns = Application.GetNamespace("MAPI")
 
@@ -74,7 +87,9 @@ End Sub
 
 
 Sub Minden_Email_Athelyezese()
-' MINDEN LEVELET ÁTMÁSOL AMI A MAPPÁBAN VAN
+' DoWtHen Makró 2026.05.01
+' MINDEN LEVELET ÁTMÁSOL AMI A BEJÖVŐ MAPPÁBAN VAN
+
     On Error GoTo ErrHandler
 
     Dim ns As Outlook.NameSpace
@@ -82,10 +97,15 @@ Sub Minden_Email_Athelyezese()
     Dim destFolder As Outlook.MAPIFolder
     Dim itm As Outlook.MailItem
 
+  If MsgBox("Minden levél áthelyezése az Archívum mappába." & vbCrLf & "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
+    MsgBox "Akkor kilépek."
+    Exit Sub
+  End If
+
     Set ns = Application.GetNamespace("MAPI")
     Set inbox = ns.GetDefaultFolder(olFolderInbox)
 
-    ' ?? Célmappa
+    ' ?? IDE ÍRD A CÉL MAPPÁT
     Set destFolder = inbox.Folders("Archiválás")
 
     While inbox.Items.Count > 0
@@ -104,7 +124,25 @@ ErrHandler:
 End Sub
 
 
+Sub PrintFolders(ByVal fld As Outlook.MAPIFolder, ByVal indent As String)
+' DoWtHen Makró 2026.05.01
+' Az Immediate ablakban sorolja fel az Outlook mappaneveket
+' Ez a függvény része!
+
+    Dim subFld As Outlook.MAPIFolder
+
+    Debug.Print indent & fld.Name
+
+    For Each subFld In fld.Folders
+        PrintFolders subFld, indent & "    "
+    Next subFld
+End Sub
+
+
 Sub Mappanevek_Listaja()
+' DoWtHen Makró 2026.05.01
+' Az Immediate ablakban sorolja fel az Outlook mappaneveket
+
     Dim ns As Outlook.NameSpace
     Dim root As Outlook.MAPIFolder
 
@@ -115,24 +153,62 @@ Sub Mappanevek_Listaja()
     Call PrintFolders(root, "")
 End Sub
 
-Sub PrintFolders(ByVal fld As Outlook.MAPIFolder, ByVal indent As String)
-    Dim subFld As Outlook.MAPIFolder
 
-    Debug.Print indent & fld.Name
+Sub UjEmailSablonbol_1()
+' DoWtHen Makró 2026.05.01
+' Sablon levél fájl megnyítása
 
-    For Each subFld In fld.Folders
-        PrintFolders subFld, indent & "    "
-    Next subFld
-End Sub
-```
-
-## Outlook makró sablon level megnyitása:
-
-```vba
-Sub UjEmailSablonbol()
     Dim MyItem As Outlook.MailItem
-    Set MyItem = Application.CreateItemFromTemplate( _
-        "C:\Users\dowth\AppData\Roaming\Microsoft\Templates\dwh.oft")
+    Dim path As String
+    Dim fajlNev As String
+
+fajlNev = "dwh.oft"
+path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
+Set MyItem = Application.CreateItemFromTemplate(path)
+
     MyItem.Display
 End Sub
+
+
+Sub UjEmailSablonbol_2()
+' DoWtHen Makró 2026.05.01
+' Sablon levél fájl megnyítása
+
+    Dim MyItem As Outlook.MailItem
+    Dim path As String
+    Dim fajlNev As String
+
+fajlNev = "proba2.oft"
+path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
+Set MyItem = Application.CreateItemFromTemplate(path)
+    
+    MyItem.Display
+End Sub
+
+
+Sub UjEmailFoxconn()
+' DoWtHen Makró 2026.05.01
+' Sablon levél fájl megnyítása
+
+    Dim MyItem As Outlook.MailItem
+    Dim path As String
+    Dim fajlNev As String
+
+fajlNev = "foxconn.oft"
+path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
+Set MyItem = Application.CreateItemFromTemplate(path)
+
+    MyItem.Display
+End Sub
+
+
+Sub TemplatesMappaMegnyitasa()
+' DoWtHen Makró 2026.09.12
+' Megnyitja a Templates mappát
+
+    Dim path As String
+    path = Environ$("APPDATA") & "\Microsoft\Templates\"
+    Shell "explorer.exe """ & path & """", vbNormalFocus
+End Sub
+
 ```
