@@ -66,7 +66,7 @@ Sub Kijelolt_Emailek_Athelyezese()
     Set ns = Application.GetNamespace("MAPI")
 
     ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("dowthen@freemail.hu")
+    Set root = ns.Folders("valami@valamimail.hu")
 
     If root Is Nothing Then
         MsgBox "Nem találom a postafiókot.", vbCritical
@@ -126,7 +126,7 @@ Sub Minden_Email_Athelyezese()
     Set ns = Application.GetNamespace("MAPI")
 
     ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("dowthen@freemail.hu")
+    Set root = ns.Folders("valami@valamimail.hu")
 
     If root Is Nothing Then
         MsgBox "Nem találom a postafiókot.", vbCritical
