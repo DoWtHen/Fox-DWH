@@ -4,8 +4,58 @@
 '       LÁDA SZÁMOLÁS KÉPLETEK
 '              FoxConn
 '====================================
+Sub LADA_tartalom_LAP()
+' DoWtHen Makró 2026.09.20
+' Foxconn segédlet
+' LÁDA tartalom  munkalap létrehozása fejlécek beállítása
+' Copolit segítségével
+
+Dim lapNev As String
+Dim ws As Worksheet
+    
+lapNev = "LÁDA tartalom"
+    
+    '--- Ellenőrzés: létezik-e már a munkalap ---
+    On Error Resume Next
+    Set ws = ActiveWorkbook.Worksheets(lapNev)
+    On Error GoTo 0
+    
+    If Not ws Is Nothing Then
+        ' Ha létezik, kilépünk
+        MsgBox "A(z) '" & lapNev & "' munkalap már létezik!", vbInformation, "Van ilyen munkalap"
+        Exit Sub
+    End If
+    
+    '--- Új lap létrehozása az utolsó mögé ---
+Set ws = ActiveWorkbook.Worksheets.Add(After:=ActiveWorkbook.Worksheets(ActiveWorkbook.Worksheets.Count))
+ws.Name = lapNev
+
+    ActiveSheet.Range("A1").Value = "Láda szám"
+    ActiveSheet.Range("B1").Value = "Anyagszám"
+    ActiveSheet.Range("C1").Value = "SU szám"
+    
+    With Range("A1:C1")
+        .Font.Bold = True
+        .Font.Size = 18
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .Borders(xlEdgeBottom).LineStyle = xlContinuous
+        .Borders(xlEdgeBottom).Weight = xlThin
+    End With
+    Columns("A:C").ColumnWidth = 19
+
+    Range("A2").Select
+    With ActiveWindow
+        .SplitColumn = 0
+        .SplitRow = 1
+    End With
+    ActiveWindow.FreezePanes = True
+    
+End Sub
+
 
 Sub LadaKepletek()
+
 ' DoWtHen Makró 2026.08.21
 ' Foxconn segédlet
 ' Láda képletek bemásolása a Kittingelős munkalapra
@@ -17,13 +67,57 @@ Dim kerdes As Integer
 Dim AktualCella As Range
 Dim destRange As Range
 Dim Kijeloles As Range
- 
-UtolsoC = Range("C" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
+
+UtolsoC = Range("C" & Rows.Count).End(xlUp).row  'A oszlop utolsó cella száma
 
     Range("D1").Select 'bár ez a makró Offset-et használ, és az aktuális cellától másolja a szöveget képleteket, mégis megadom a G1 induló cellát a hibák elkerülése miatt.
 Set AktualCella = ActiveCell 'a kijelölt cella ahova beír a makró
 
-kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & "összesítő képleteit másolja be a D1 cellától." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  " & Cells(ActiveCell.Row, ActiveCell.Column).Address(False, False) & " cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbYesNo + vbQuestion, "Adat másolása  LÁDA képletek")
+kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & "összesítő képletet másolom be a D1 cellától." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  " & Cells(ActiveCell.row, ActiveCell.Column).Address(False, False) & " cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbYesNo + vbQuestion, "Adat másolása  LÁDA képletek")
+
+ If kerdes <> vbYes Then 'ha nem igen kilépek
+        MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
+        Exit Sub
+ End If
+ 
+    AktualCella.Value = "Hány DB SU van ebből az anyagból a ládában"
+    ActiveCell.ColumnWidth = 20
+    ActiveCell.WrapText = True
+    'ActiveCell.Offset(1, 0).FormulaLocal = "=HA(B2="""";"""";DARAB2(C3:INDEX(C:C;HOL.VAN("" * "";B3:B$5026;0)+SOR(C3)-1)))"  'magyar verzió egy sorral lejebb
+    ActiveCell.Offset(1, 0).Formula = "=IF(B2="""","""",COUNTA(C3:INDEX(C:C,MATCH(""*"",B3:B$5026,0)+ROW(C3)-1)))"  'angol verzió egy sorral lejebb
+    
+    ActiveCell.Offset(1, 0).Select  'egysorral lejebb és balra kettőt
+    Range(ActiveCell, ActiveCell.Offset(0, 0)).Select  'kijelöli ugyan azt a cellát
+    Selection.HorizontalAlignment = xlCenter
+    Selection.VerticalAlignment = xlCenter
+    Selection.AutoFill Destination:=Range(ActiveCell, Cells(UtolsoC, ActiveCell.Column + 0)), Type:=xlFillDefault  'lemásolja az utolsó celláig
+    
+    Range("G1").Value = ".": Range("G1").Select  'egysorban de ez két művelet
+
+End Sub
+
+Sub LadaKepletek_RÉGI()
+' DoWtHen Makró 2026.08.21
+' Foxconn segédlet
+' Láda képletek bemásolása a Kittingelős munkalapra
+' Megmutatja hány tekercs van az adott ládában és összesen a WO-hoz
+' Copolit szerkesztette
+
+' ****    Már nem kell a 3 oszlopnyi statisztika     *********************
+'         ======================================
+
+Dim UtolsoC As Long
+Dim kerdes As Integer
+Dim AktualCella As Range
+Dim destRange As Range
+Dim Kijeloles As Range
+ 
+UtolsoC = Range("C" & Rows.Count).End(xlUp).row  'A oszlop utolsó cella száma
+
+    Range("D1").Select 'bár ez a makró Offset-et használ, és az aktuális cellától másolja a szöveget képleteket, mégis megadom a G1 induló cellát a hibák elkerülése miatt.
+Set AktualCella = ActiveCell 'a kijelölt cella ahova beír a makró
+
+kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & "összesítő képleteit másolja be a D1 cellától." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  " & Cells(ActiveCell.row, ActiveCell.Column).Address(False, False) & " cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbYesNo + vbQuestion, "Adat másolása  LÁDA képletek")
 
  If kerdes <> vbYes Then 'ha nem igen kilépek
         MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
@@ -34,7 +128,7 @@ kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & 
     ActiveCell.ColumnWidth = 20
     ActiveCell.WrapText = True
     'ActiveCell.Offset(1, 0).FormulaLocal = "=HA(B2="""";"""";DARAB2(C3:INDEX(C:C;HOL.VAN("" * "";B3:B$5026;0)+SOR(C3)-1)))"  'magyar verzió egy sorral lejebb
-    ActiveCell.Offset(1, 0).Formula = "=IF(B2="""","""",COUNTA(C3:INDEX(C:C,MATCH(""*"",B3:B$5026,0)+ROW(C3)-1)))"  'egy sorral lejebb
+    ActiveCell.Offset(1, 0).Formula = "=IF(B2="""","""",COUNTA(C3:INDEX(C:C,MATCH(""*"",B3:B$5026,0)+ROW(C3)-1)))"  'angol verzió egy sorral lejebb
     ActiveCell.Offset(0, 1).Select  'egy oszloppal jobbra
     
     ActiveCell.Offset(0, 0) = "Összesen ennyi tekercs van a WO-ra kiadva ebből az anyagból"  'ugyan oda
@@ -62,6 +156,8 @@ End Sub
 
 Sub LADA_PN_Lista()
 ' DoWtHen Makró 2026.08.22
+' v2 DoWtHen Makró 2026.09.17
+' v3 2026.09.20
 ' Foxconn segédlet
 ' Anyagszám rendezése abc-be, Láda számok hozzáerendelés az anyagszámokhoz
 ' Melyik ládákban van az adott anyag
@@ -74,46 +170,93 @@ Sub LADA_PN_Lista()
     Dim wo As String
     Dim woList As String
     Dim k As Long
-    
-' Növekvő sorrendbe rakva anyagokat felsorolja melyik ládákban találhatóak
+    Dim r As Long
+    Dim db As Long
+    Dim dict As Object
+    Dim key As Variant
+
     '=== MEGERŐSÍTÉS ===
-    If MsgBox("A ""Láda tartalom"" munkalapon" & vbCrLf & "növekvő sorrendbe rakva az anyagokat" & vbCrLf & "felsorolja melyik ládákban találhatóak." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  H1  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbQuestion + vbYesNo, "Adat másolás  LÁDA PN Lista") = vbNo Then
+    If MsgBox("A ""Láda tartalom"" munkalapon" & vbCrLf & "növekvő sorrendbe rakva az anyagokat" & vbCrLf & "felsorolja melyik ládákban találhatóak." & vbCrLf & vbCrLf & _
+              "Ez a makró a  H1  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbQuestion + vbYesNo, "Adat másolás  LÁDA PN Lista") = vbNo Then
         MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
         Exit Sub
     End If
-    
-    lastRow = Cells(Rows.Count, "B").End(xlUp).Row
-    
-    '=== LISTA KÉSZÍTÉSE ===
-    Range("B2:B" & lastRow).Copy
-    Range("H2").PasteSpecial Paste:=xlPasteValues
-    Application.CutCopyMode = False
 
-    ActiveSheet.Range("$H$2:$H" & lastRow).RemoveDuplicates Columns:=1, Header:=xlNo
+    '=== ALAP ADATOK ===
+    lastRow = Cells(Rows.Count, "B").End(xlUp).row
+
+    '=== LISTA KÉSZÍTÉSE ===
+    Range("H2:H" & lastRow).Value = Range("B2:B" & lastRow).Value
+    Range("H2:H" & lastRow).RemoveDuplicates Columns:=1, Header:=xlNo
 
     '=== RENDEZÉS ===
     With ActiveSheet.Sort
         .SortFields.Clear
-        .SortFields.Add2 Key:=Range("H2:H" & lastRow), _
-            SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
-
+        .SortFields.Add2 key:=Range("H2:H" & lastRow), _
+            SortOn:=xlSortOnValues, Order:=xlAscending
         .SetRange Range("H2:H" & lastRow)
         .Header = xlNo
-        .MatchCase = False
-        .Orientation = xlTopToBottom
-        .SortMethod = xlPinYin
         .Apply
     End With
-    
-    '=== ÜRES CELLÁK TÖRLÉSE (EZ KELL A HIBA MEGSZŰNÉSÉHEZ!) ===
+
+    '=== ÜRES CELLÁK TÖRLÉSE ===
     On Error Resume Next
     Range("H2:H" & lastRow).SpecialCells(xlCellTypeBlanks).Delete Shift:=xlUp
     On Error GoTo 0
-    
+
     '=== ÚJ lastPN meghatározása ===
-    lastPN = Cells(Rows.Count, "H").End(xlUp).Row
+    lastPN = Cells(Rows.Count, "H").End(xlUp).row
     
-Application.Wait (Now + TimeValue("0:00:02")) 'egy kis szünet
+
+    '=== PN LÁDA LISTA ===
+    For i = 2 To lastPN
+
+        pn = Cells(i, "H").Value
+        Set dict = CreateObject("Scripting.Dictionary")
+
+        '=== Végigmegyünk az A–B–C táblán, és ládánként gyűjtjük az SU-kat ===
+        For j = 2 To lastRow
+
+            If Cells(j, "B").Value = pn Then
+
+                '=== LÁDA sor megkeresése felfelé ===
+                k = j
+                Do While k > 1 And Cells(k, "A").Value = ""
+                    k = k - 1
+                Loop
+                wo = Cells(k, "A").Value   ' ládaszám
+
+                '=== Ha még nincs ilyen láda a dict-ben, felvesszük ===
+                If Not dict.Exists(wo) Then
+                    dict(wo) = 0
+                End If
+
+                '=== SU-k számlálása ettől a PN-blokktól lefelé ===
+                r = j
+                Do While r <= lastRow _
+                      And (r = j Or (Cells(r, "A").Value = "" And Cells(r, "B").Value = ""))
+
+                    If Cells(r, "C").Value <> "" Then
+                        dict(wo) = dict(wo) + 1
+                    End If
+
+                    r = r + 1
+                Loop
+            End If
+        Next j
+
+        '=== LÁDA + DARABSZÁM SZÖVEG FELÉPÍTÉSE ===
+        woList = ""
+        For Each key In dict.Keys
+            db = dict(key)
+            If woList = "" Then
+                woList = key & " (" & db & " db)"
+            Else
+                woList = woList & ",  " & key & " (" & db & " db)"
+            End If
+        Next key
+        Cells(i, "J").Value = woList
+    Next i
 
     '=== ÖSSZES TEKERCS DBSZÁM ===
     Range("I2").Select
@@ -122,54 +265,22 @@ Application.Wait (Now + TimeValue("0:00:02")) 'egy kis szünet
     Range("I2").Select
     Range("I2").AutoFill Destination:=Range("I2:I" & lastPN), Type:=xlFillDefault 'lemásolja az utolsó celláig
     
-    '=== PN LÁDA LISTA ===
-    For i = 2 To lastPN
-        pn = Cells(i, "H").Value
-        woList = ""
-
-        For j = 2 To lastRow
-
-            If Cells(j, "B").Value = pn Then
-
-                ' WO visszakeresése felfelé
-                k = j
-                Do While k > 1 And Cells(k, "A").Value = ""
-                    k = k - 1
-                Loop
-                wo = Cells(k, "A").Value
-
-                ' WO hozzáadása a listához
-                If InStr(woList, wo) = 0 Then
-                    If woList = "" Then
-                        woList = wo
-                    Else
-                        woList = woList & ",  " & wo
-                    End If
-                End If
-
-            End If
-        Next j
-
-        Cells(i, "J").Value = woList
-    Next i
-    
-    ' === FEJLÉC ===
+    '=== FEJLÉC ===
     Range("H1") = "Anyagszám"
     Range("I1") = "Összes tekercs száma"
-    Range("J1") = "Ezekben a Ládákban találod"
-    Range("H1:J1").Select
-    
-    Selection.Font.Bold = True
-    Selection.Font.Size = 18
-    With Selection
+    Range("J1") = "Ezekben a Ládákban találod (DBszám)"
+
+    With Range("H1:J1")
+        .Font.Bold = True
+        .Font.Size = 18
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
     End With
-    
+
     Rows(1).RowHeight = 49.5
     Columns("H:H").ColumnWidth = 18.5
     Columns("J:J").ColumnWidth = 55
-    Columns("I").ColumnWidth = 8.2
+    Columns("I:I").ColumnWidth = 8.2
     
     Range("I1").Select
     With Selection
@@ -182,7 +293,7 @@ Application.Wait (Now + TimeValue("0:00:02")) 'egy kis szünet
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
     End With
-    
+
     Range("G1").Value = ".": Range("G1").Select  'egysorban de ez két művelet
 End Sub
 
@@ -198,7 +309,12 @@ Dim rng As Range
 Dim c As Range
 Dim vanLap As Boolean
 
-If MsgBox("A ""kitting lista"" munkalapon az H oszloptól bemásolt LX02-es listából átírja a C oszlopba a WO-ra kikönyvelt DBszámokat." & vbCrLf & "A tételeket szinezi zöld, sárga, piros színnel." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  C2  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbQuestion + vbYesNo, "Adat másolás  Kitting Lista DBszám") = vbNo Then
+If MsgBox("A ""kitting lista"" munkalapon az H oszloptól bemásolt LX02-es listából átírja a C oszlopba a WO-ra kikönyvelt DBszámokat." & vbCrLf & _
+    "A tételeket szinezi zöld, sárga, piros színnel." & vbCrLf & _
+    Space(7) & "LILA színnel jelöltem amiket csak az LX02 hoz fel," & vbCrLf & Space(7) & "de a kitting listában nem szerepel!" _
+    & vbCrLf & vbCrLf & vbCrLf & _
+    "Ez a makró a  C2  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & _
+    " Mehet?", vbQuestion + vbYesNo, "Adat másolás  Kitting Lista DBszám") = vbNo Then
     MsgBox "Akkor kilépek", vbCritical, "Mégsem"
     Exit Sub
 End If
@@ -208,7 +324,7 @@ If ActiveSheet.Name <> "kitting lista" Then
     Exit Sub
 End If
 
-UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
+UtolsoA = Range("A" & Rows.Count).End(xlUp).row  'A oszlop utolsó cella száma
 
     Range("C2").Select
     'ActiveCell.FormulaLocal = "=XKERES($A2;$H:$H;$J:$J;"""")"  'magyar verzió
@@ -228,6 +344,21 @@ Set rng = Range("C2:C" & UtolsoA) 'C2-től indulunk, és lefelé megyünk a C os
             c.Interior.Color = RGB(255, 255, 0)
         End If
     Next c
+    
+    '=== H oszlop ellenőrzése: ha nincs az A oszlopban › lilla ===
+' Space(7) & "LILA színnel jelöltem amiket csak az LX02 hoz fel," & vbCrLf & Space(7) & "de a kitting listában nem szerepel!"
+Dim lastH As Long
+Dim hCell As Range
+
+lastH = Cells(Rows.Count, "H").End(xlUp).row
+
+  For Each hCell In Range("H2:H" & lastH)
+    If hCell.Value <> "" Then
+        If WorksheetFunction.CountIf(Range("A:A"), hCell.Value) = 0 Then
+            hCell.Interior.Color = RGB(112, 48, 160)
+        End If
+    End If
+  Next hCell
 End Sub
 
 ```
