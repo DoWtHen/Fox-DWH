@@ -1,5 +1,4 @@
 ```vba
-
 '====================================
 '       LÁDA SZÁMOLÁS KÉPLETEK
 '              FoxConn
@@ -15,6 +14,12 @@ Dim ws As Worksheet
     
 lapNev = "LÁDA tartalom"
     
+If MsgBox("Létrehozom a ""LÁDA tartalom"" lapot" & vbCrLf & "a munkafüzet legvégére." & vbCrLf & "Beírom a fejléc megnevezéseit is." & vbCrLf & Space(20) & " Mehet?", vbQuestion + vbYesNo, "LÁDA tartalom") = vbNo Then
+     MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
+    Exit Sub
+End If
+    
+    
     '--- Ellenőrzés: létezik-e már a munkalap ---
     On Error Resume Next
     Set ws = ActiveWorkbook.Worksheets(lapNev)
@@ -22,7 +27,7 @@ lapNev = "LÁDA tartalom"
     
     If Not ws Is Nothing Then
         ' Ha létezik, kilépünk
-        MsgBox "A(z) '" & lapNev & "' munkalap már létezik!", vbInformation, "Van ilyen munkalap"
+        MsgBox "A '" & lapNev & "' munkalap már létezik!" & vbCrLf & "Kilépek.", vbCritical, "Van ilyen munkalap"
         Exit Sub
     End If
     
@@ -55,7 +60,6 @@ End Sub
 
 
 Sub LadaKepletek()
-
 ' DoWtHen Makró 2026.08.21
 ' Foxconn segédlet
 ' Láda képletek bemásolása a Kittingelős munkalapra
@@ -76,7 +80,7 @@ Set AktualCella = ActiveCell 'a kijelölt cella ahova beír a makró
 kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & "összesítő képletet másolom be a D1 cellától." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  " & Cells(ActiveCell.row, ActiveCell.Column).Address(False, False) & " cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbYesNo + vbQuestion, "Adat másolása  LÁDA képletek")
 
  If kerdes <> vbYes Then 'ha nem igen kilépek
-        MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
+         MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
         Exit Sub
  End If
  
@@ -120,7 +124,7 @@ Set AktualCella = ActiveCell 'a kijelölt cella ahova beír a makró
 kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & "összesítő képleteit másolja be a D1 cellától." & vbCrLf & vbCrLf & vbCrLf & "Ez a makró a  " & Cells(ActiveCell.row, ActiveCell.Column).Address(False, False) & " cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbYesNo + vbQuestion, "Adat másolása  LÁDA képletek")
 
  If kerdes <> vbYes Then 'ha nem igen kilépek
-        MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
+         MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
         Exit Sub
  End If
     
@@ -178,7 +182,7 @@ Sub LADA_PN_Lista()
     '=== MEGERŐSÍTÉS ===
     If MsgBox("A ""Láda tartalom"" munkalapon" & vbCrLf & "növekvő sorrendbe rakva az anyagokat" & vbCrLf & "felsorolja melyik ládákban találhatóak." & vbCrLf & vbCrLf & _
               "Ez a makró a  H1  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & " Mehet?", vbQuestion + vbYesNo, "Adat másolás  LÁDA PN Lista") = vbNo Then
-        MsgBox "Akkor kilépek.", vbCritical, "Mégsem"
+         MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
         Exit Sub
     End If
 
@@ -315,7 +319,7 @@ If MsgBox("A ""kitting lista"" munkalapon az H oszloptól bemásolt LX02-es list
     & vbCrLf & vbCrLf & vbCrLf & _
     "Ez a makró a  C2  cellától kezd bemásolni adatokat!" & vbCrLf & Space(17) & "=====" & vbCrLf & Space(25) & _
     " Mehet?", vbQuestion + vbYesNo, "Adat másolás  Kitting Lista DBszám") = vbNo Then
-    MsgBox "Akkor kilépek", vbCritical, "Mégsem"
+     MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
     Exit Sub
 End If
 
