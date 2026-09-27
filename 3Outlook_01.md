@@ -66,7 +66,7 @@ Sub Kijelolt_Emailek_Athelyezese()
     Set ns = Application.GetNamespace("MAPI")
 
     ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("valami@valamimail.hu")
+    Set root = ns.Folders("dowthen@freemail.hu")
 
     If root Is Nothing Then
         MsgBox "Nem találom a postafiókot.", vbCritical
@@ -126,7 +126,7 @@ Sub Minden_Email_Athelyezese()
     Set ns = Application.GetNamespace("MAPI")
 
     ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("valami@valamimail.hu")
+    Set root = ns.Folders("dowthen@freemail.hu")
 
     If root Is Nothing Then
         MsgBox "Nem találom a postafiókot.", vbCritical
@@ -165,7 +165,6 @@ ErrHandler:
 End Sub
 
 
-
 Sub PrintFolders(ByVal fld As Outlook.MAPIFolder, ByVal indent As String)
 ' DoWtHen Makró 2026.05.01
 ' Az Immediate ablakban sorolja fel az Outlook mappaneveket
@@ -196,54 +195,6 @@ Sub Mappanevek_Listaja()
 End Sub
 
 
-Sub UjEmailSablonbol_1()
-' DoWtHen Makró 2026.05.01
-' Sablon levél fájl megnyítása
-
-    Dim MyItem As Outlook.MailItem
-    Dim path As String
-    Dim fajlNev As String
-
-fajlNev = "dwh.oft"
-path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
-Set MyItem = Application.CreateItemFromTemplate(path)
-
-    MyItem.Display
-End Sub
-
-
-Sub UjEmailSablonbol_2()
-' DoWtHen Makró 2026.05.01
-' Sablon levél fájl megnyítása
-
-    Dim MyItem As Outlook.MailItem
-    Dim path As String
-    Dim fajlNev As String
-
-fajlNev = "proba2.oft"
-path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
-Set MyItem = Application.CreateItemFromTemplate(path)
-    
-    MyItem.Display
-End Sub
-
-
-Sub UjEmailFoxconn()
-' DoWtHen Makró 2026.05.01
-' Sablon levél fájl megnyítása
-
-    Dim MyItem As Outlook.MailItem
-    Dim path As String
-    Dim fajlNev As String
-
-fajlNev = "foxconn.oft"
-path = Environ$("APPDATA") & "\Microsoft\Templates\" & fajlNev
-Set MyItem = Application.CreateItemFromTemplate(path)
-
-    MyItem.Display
-End Sub
-
-
 Sub TemplatesMappaMegnyitasa()
 ' DoWtHen Makró 2026.09.12
 ' Megnyitja a Templates mappát
@@ -252,4 +203,5 @@ Sub TemplatesMappaMegnyitasa()
     path = Environ$("APPDATA") & "\Microsoft\Templates\"
     Shell "explorer.exe """ & path & """", vbNormalFocus
 End Sub
+
 ```
