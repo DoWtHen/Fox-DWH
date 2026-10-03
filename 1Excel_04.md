@@ -1,8 +1,10 @@
 ```vba
+
 '====================================
 '       LÁDA SZÁMOLÁS KÉPLETEK
 '              FoxConn
 '====================================
+
 Sub LADA_tartalom_LAP()
 ' DoWtHen Makró 2026.09.20
 ' Foxconn segédlet
@@ -55,7 +57,6 @@ ws.Name = lapNev
         .SplitRow = 1
     End With
     ActiveWindow.FreezePanes = True
-    
 End Sub
 
 
@@ -96,9 +97,60 @@ kerdes = MsgBox("A ""LÁDA tartalom"" munkalapra anyagszám/DBszám" & vbCrLf & 
     Selection.VerticalAlignment = xlCenter
     Selection.AutoFill Destination:=Range(ActiveCell, Cells(UtolsoC, ActiveCell.Column + 0)), Type:=xlFillDefault  'lemásolja az utolsó celláig
     
-    Range("G1").Value = ".": Range("G1").Select  'egysorban de ez két művelet
+    Columns("E:E").ColumnWidth = 11
+    Range("E1").Select
+    With Selection
+        .WrapText = True
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+    End With
+    
+    Range("E1").Value = "<-Generálva: " & Format(Date, "yyyy.mm.dd"): Range("G1").Select 'egysorban de ez két művelet
 
+Application.Wait (Now + TimeValue("0:00:01")) ' Egy kis szünet
+    
+    P_kezdetu_anyagszamok 'meghívom a következő makrót
 End Sub
+
+
+Sub P_kezdetu_anyagszamok()
+' DoWtHen Makró 2026.10.03
+' Foxconn segédlet
+' Beszkenneléskor P betűvel kezdődő anyagszámok javítása, törli a P betűt
+' Copolit szerkesztette
+
+    Dim lastRow As Long
+    Dim i As Long
+    Dim cellValue As String
+    Dim talalat As Long
+
+    talalat = 0
+
+    'B oszlop utolsó sora
+lastRow = Cells(Rows.Count, "B").End(xlUp).row
+
+    For i = 1 To lastRow
+        
+        cellValue = Trim(Cells(i, "B").Value)
+        
+        'ha nem üres és P betűvel kezdődik
+        If cellValue <> "" Then
+            If Left(cellValue, 1) = "P" Then
+                ' Találat számolása
+                talalat = talalat + 1
+                ' P betű eltávolítása az elejéről
+                Cells(i, "B").Value = Mid(cellValue, 2)
+            End If
+        End If
+    Next i
+
+  If talalat = 0 Then 'ha nincs találat lépjen ki
+    Exit Sub
+  End If
+ 
+    MsgBox "P-vel kezdődő anyagszámok száma: " & talalat & vbCrLf & Space(10) & "Javítottam!", vbInformation, "Anyagszám Ellenőrzés"
+End Sub
+
 
 Sub LadaKepletek_RÉGI()
 ' DoWtHen Makró 2026.08.21
@@ -282,23 +334,25 @@ Sub LADA_PN_Lista()
     End With
 
     Rows(1).RowHeight = 49.5
+    Columns("G:G").ColumnWidth = 12
     Columns("H:H").ColumnWidth = 18.5
     Columns("J:J").ColumnWidth = 55
     Columns("I:I").ColumnWidth = 8.2
     
-    Range("I1").Select
+    Range("I1", "G1").Select
     With Selection
         .Font.Name = "Calibri"
         .Font.Size = 12
         .Font.Bold = False
         .WrapText = True
     End With
-    With Columns("I")
+    With Range("G:G, I:I")
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
     End With
 
-    Range("G1").Value = ".": Range("G1").Select  'egysorban de ez két művelet
+    Columns("J:J").EntireColumn.AutoFit 'J oszlop széthúzása
+    Range("G1").Value = "Generálva:-> " & Format(Date, "yyyy.mm.dd"): Range("G1").Select  'egysorban de ez két művelet
 End Sub
 
 
@@ -364,5 +418,6 @@ lastH = Cells(Rows.Count, "H").End(xlUp).row
     End If
   Next hCell
 End Sub
+
 
 ```
