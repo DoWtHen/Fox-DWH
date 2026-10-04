@@ -2,6 +2,7 @@
 ## Outlook makró a levelek áthelyezésére:
 
 ```vba
+
 Sub Kijelolt_Emailek_Athelyezese_Tallozas()
 ' DoWtHen Makró 2026.05.01
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT MAPPA TALLÓZÁS ABLAKKAL
@@ -12,10 +13,10 @@ Sub Kijelolt_Emailek_Athelyezese_Tallozas()
     Dim destFolder As Outlook.MAPIFolder
     Dim itm As Object
 
-  If MsgBox("A kijelölt levelek áthelyezése Tallózás ablakkal." & vbCrLf & "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
-    MsgBox "Akkor kilépek."
-    Exit Sub
-  End If
+  'If MsgBox("A kijelölt levelek áthelyezése Tallózás ablakkal." & vbCrLf & "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
+  '  MsgBox "Akkor kilépek."
+  '  Exit Sub
+  'End If
 
     Set ns = Application.GetNamespace("MAPI")
 
@@ -50,57 +51,89 @@ Sub Kijelolt_Emailek_Athelyezese()
 ' v2 2026.09.20
 ' CSAK A KIJELÖLT LEVELEKET MÁSOLJA ÁT
 
-    On Error GoTo ErrHandler
-
-    Dim ns As Outlook.NameSpace
-    Dim root As Outlook.MAPIFolder
-    Dim destFolder As Outlook.MAPIFolder
-    Dim itm As Object
-
+    Dim objSelection As Outlook.Selection
+    Dim objItem As Object
+    Dim objNamespace As Outlook.NameSpace
+    Dim objPstStore As Outlook.Store
+    Dim objArchiveFolder As Outlook.MAPIFolder
+    Dim targetPstName As String
+    Dim targetFolderName As String
+    
     If MsgBox("A kijelölt levelek áthelyezése az Archivum mappába." & vbCrLf & _
               "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
         MsgBox "Akkor kilépek."
         Exit Sub
     End If
-
-    Set ns = Application.GetNamespace("MAPI")
-
-    ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("valami@email.qhu")
-
-    If root Is Nothing Then
-        MsgBox "Nem találom a postafiókot.", vbCritical
+    
+    ' --- BEÁLLÍTÁSOK ---
+    ' Az Outlook oldalsávján megjelenő PST adatfájl pontos neve
+    targetPstName = "Archívumok"
+    ' A PST fájlon belüli célmappa neve (pl. "Beérkezett üzenetek", "Archívum" vagy "Mappa")
+    targetFolderName = "Beérkezett üzenetek"
+    ' -------------------
+    
+    ' Kijelölt elemek lekérése
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    ' Ellenőrzés, hogy van-e kijelölt elem
+    If objSelection.Count = 0 Then
+        MsgBox "Nincs kijelölve levél az archiváláshoz!", vbExclamation, "Hiba"
         Exit Sub
     End If
-
-    ' --- ARCHIVUM MAPPA MEGTALÁLÁSA ---
+    
+    Set objNamespace = Application.GetNamespace("MAPI")
+    
+    ' Megkeressük a megadott nevű PST adatfájlt a csatolt tárolók között
     On Error Resume Next
-    Set destFolder = root.Folders("Archivum")
-    On Error GoTo ErrHandler
-
-    If destFolder Is Nothing Then
-        MsgBox "Nem található az 'Archivum' mappa.", vbCritical
-        Exit Sub
-    End If
-
-    ' --- KIJELÖLT ELEMEK ELLENŐRZÉSE ---
-    If Application.ActiveExplorer.Selection.Count = 0 Then
-        MsgBox "Nincs kijelölt elem.", vbExclamation
-        Exit Sub
-    End If
-
-    ' --- ÁTHELYEZÉS ---
-    For Each itm In Application.ActiveExplorer.Selection
-        If TypeOf itm Is Outlook.MailItem Then
-            itm.Move destFolder
+    Dim tempStore As Outlook.Store
+    For Each tempStore In objNamespace.Stores
+        If tempStore.DisplayName = targetPstName Then
+            Set objPstStore = tempStore
+            Exit For
         End If
-    Next itm
-
-    MsgBox "Áthelyezés kész.", vbInformation
-    Exit Sub
-
-ErrHandler:
-    MsgBox "Hiba történt: " & Err.Description, vbCritical
+    Next tempStore
+    On Error GoTo 0
+    
+    ' Ha nem találja az adatfájlt
+    If objPstStore Is Nothing Then
+        MsgBox "A(z) '" & targetPstName & "' nevű adatfájl nem található az Outlookban! Kérjük, ellenőrizze a nevet az oldalsávon.", vbCritical, "Hiba"
+        Exit Sub
+    End If
+    
+    ' Megkeressük a célmappát a PST fájlon belül
+    On Error Resume Next
+    Set objArchiveFolder = objPstStore.GetRootFolder.Folders(targetFolderName)
+    On Error GoTo 0
+    
+    ' Ha a megadott mappa nem létezik az adatfájlban, létrehozzuk
+    If objArchiveFolder Is Nothing Then
+        On Error Resume Next
+        Set objArchiveFolder = objPstStore.GetRootFolder.Folders.Add(targetFolderName)
+        On Error GoTo 0
+    End If
+    
+    ' Végső ellenőrzés a mappára
+    If objArchiveFolder Is Nothing Then
+        MsgBox "Nem sikerült elérni vagy létrehozni a(z) '" & targetFolderName & "' mappát!", vbCritical, "Hiba"
+        Exit Sub
+    End If
+    
+    ' Levelek áthelyezése hátulról előre haladva
+    Dim i As Long
+    Dim movedCount As Long
+    movedCount = 0
+    
+    For i = objSelection.Count To 1 Step -1
+        Set objItem = objSelection.Item(i)
+        If TypeOf objItem Is Outlook.MailItem Then
+            objItem.Move objArchiveFolder
+            movedCount = movedCount + 1
+        End If
+    Next i
+    
+    ' Opcionális visszajelzés az állapotsoron (nem zavar felugró ablakkal)
+    Application.ActiveExplorer.ClearSelection
+    StatusBar = movedCount & " levél sikeresen áthelyezve a(z) " & targetPstName & " adatfájlba."
 End Sub
 
 
@@ -109,59 +142,83 @@ Sub Minden_Email_Athelyezese()
 ' v2 2026.09.20
 ' MINDEN LEVELET ÁTHELYEZ AMI A BEJÖVŐ MAPPÁBAN VAN
 
-    On Error GoTo ErrHandler
-
-    Dim ns As Outlook.NameSpace
-    Dim root As Outlook.MAPIFolder
-    Dim inbox As Outlook.MAPIFolder
-    Dim destFolder As Outlook.MAPIFolder
-    Dim itm As Object
-
-    If MsgBox("Minden levél áthelyezése az Archivum mappába." & vbCrLf & _
-              "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "Megerősítés") = vbNo Then
-        MsgBox "Akkor kilépek."
+    Dim objNamespace As Outlook.NameSpace
+    Dim objInboxFolder As Outlook.MAPIFolder
+    Dim objPstStore As Outlook.Store
+    Dim objArchiveFolder As Outlook.MAPIFolder
+    Dim objItem As Object
+    Dim targetPstName As String
+    Dim targetFolderName As String
+    Dim i As Long
+    Dim movedCount As Long
+    
+    ' --- BEÁLLÍTÁSOK ---
+    ' Az Outlook oldalsávján megjelenő PST adatfájl pontos neve
+    targetPstName = "Archívumok"
+    ' A PST fájlon belüli célmappa neve
+    targetFolderName = "Beérkezett üzenetek"
+    ' -------------------
+    
+    Set objNamespace = Application.GetNamespace("MAPI")
+    
+    ' 1. Az aktuális fő Beérkezett üzenetek mappa lekérése
+    Set objInboxFolder = objNamespace.GetDefaultFolder(olFolderInbox)
+    
+    ' Ellenőrzés, hogy van-e benne egyáltalán levél
+    If objInboxFolder.Items.Count = 0 Then
+        MsgBox "A Beérkezett üzenetek mappa már teljesen üres!", vbInformation, "Információ"
         Exit Sub
     End If
-
-    Set ns = Application.GetNamespace("MAPI")
-
-    ' --- POSTAFIÓK GYÖKERÉNEK MEGTALÁLÁSA ---
-    Set root = ns.Folders("valamin@mail.qhu")
-
-    If root Is Nothing Then
-        MsgBox "Nem találom a postafiókot.", vbCritical
-        Exit Sub
-    End If
-
-    ' --- ARCHIVUM MAPPA MEGTALÁLÁSA ---
+    
+    ' 2. Az "Archívumok" nevű PST adatfájl megkeresése
     On Error Resume Next
-    Set destFolder = root.Folders("Archivum")
-    On Error GoTo ErrHandler
-
-    If destFolder Is Nothing Then
-        MsgBox "Nem található az 'Archivum' mappa.", vbCritical
+    Dim tempStore As Outlook.Store
+    For Each tempStore In objNamespace.Stores
+        If tempStore.DisplayName = targetPstName Then
+            Set objPstStore = tempStore
+            Exit For
+        End If
+    Next tempStore
+    On Error GoTo 0
+    
+    ' Ha nem találja az adatfájlt
+    If objPstStore Is Nothing Then
+        MsgBox "A(z) '" & targetPstName & "' nevű adatfájl nem található az Outlookban! Kérjük, ellenőrizze a nevet a bal oldali sávban.", vbCritical, "Hiba"
         Exit Sub
     End If
-
-    ' --- BEJÖVŐ MAPPAK MEGTALÁLÁSA ---
-    Set inbox = ns.GetDefaultFolder(olFolderInbox)
-
-    ' --- ÁTHELYEZÉS ---
-    While inbox.Items.Count > 0
-        Set itm = inbox.Items(1)
-
-        If TypeOf itm Is Outlook.MailItem Then
-            itm.Move destFolder
-        Else
-            itm.Delete
+    
+    ' 3. Célmappa megkeresése vagy létrehozása a PST fájlon belül
+    On Error Resume Next
+    Set objArchiveFolder = objPstStore.GetRootFolder.Folders(targetFolderName)
+    On Error GoTo 0
+    
+    ' Ha a mappa még nem létezik az adatfájlban, létrehozzuk
+    If objArchiveFolder Is Nothing Then
+        On Error Resume Next
+        Set objArchiveFolder = objPstStore.GetRootFolder.Folders.Add(targetFolderName)
+        On Error GoTo 0
+    End If
+    
+    ' Végső ellenőrzés a célmappára
+    If objArchiveFolder Is Nothing Then
+        MsgBox "Nem sikerült elérni vagy létrehozni a(z) '" & targetFolderName & "' mappát a(z) " & targetPstName & " fájlban!", vbCritical, "Hiba"
+        Exit Sub
+    End If
+    
+    ' 4. ÖSSZES levél áthelyezése (hátulról előre haladva a számozásban a hibák elkerülése végett)
+    movedCount = 0
+    For i = objInboxFolder.Items.Count To 1 Step -1
+        Set objItem = objInboxFolder.Items(i)
+        
+        ' Csak a leveleket mozgatjuk (értekezlet-meghívókat, feladatokat nem, ha esetleg lennének ott)
+        If TypeOf objItem Is Outlook.MailItem Then
+            objItem.Move objArchiveFolder
+            movedCount = movedCount + 1
         End If
-    Wend
-
-    MsgBox "Minden levél áthelyezve.", vbInformation
-    Exit Sub
-
-ErrHandler:
-    MsgBox "Hiba történt: " & Err.Description, vbCritical
+    Next i
+    
+    ' Visszajelzés a sikeres futásról
+    MsgBox movedCount & " darab levél sikeresen átmozgatva a(z) '" & targetPstName & "' adatfájlba.", vbInformation, "Kész"
 End Sub
 
 
