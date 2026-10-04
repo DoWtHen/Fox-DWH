@@ -6,8 +6,7 @@
 
 Sub ValaszSzoveg_I()
 ' DoWtHen Makró 2026.10.01
-' Válasz Szöbeg Sablonok
-' CSAK a levél legelejére tud beszúrni szöveget!
+' Válasz Szöveg Sablonok
 ' IC tesztesek
 
 Dim objDoc As Object
@@ -35,7 +34,6 @@ End Sub
 Sub ValaszSzoveg_II()
 ' DoWtHen Makró 2026.10.01
 ' Válasz Szöbeg Sablonok
-' CSAK a levél legelejére tud beszúrni szöveget!
 ' DeBug
 
 Dim objDoc As Object
@@ -62,8 +60,7 @@ End Sub
 
 Sub ValaszSzoveg_III()
 ' DoWtHen Makró 2026.10.01
-' Válasz Szöbeg Sablonok
-' CSAK a levél legelejére tud beszúrni szöveget!
+' Válasz Szöveg Sablonok
 ' IQAC
 
 Dim objDoc As Object
