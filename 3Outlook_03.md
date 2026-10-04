@@ -10,29 +10,25 @@ Sub ValaszSzoveg_I()
 ' CSAK a levél legelejére tud beszúrni szöveget!
 ' IC tesztesek
 
-Dim sel As Outlook.Selection
-Dim mail As Outlook.MailItem
+Dim objDoc As Object
+Dim objSel As Object
 
-    ' Kijelölt elem lekérése
-    Set sel = Application.ActiveExplorer.Selection
-    If sel.Count = 0 Then
-        MsgBox "Nincs kijelölt levél.", vbExclamation
-        Exit Sub
-    End If
-
-    ' Csak MailItem esetén
-    If TypeOf sel.Item(1) Is Outlook.MailItem Then
-        Set mail = sel.Item(1)
-    Else
-        MsgBox "Ez nem e-mail.", vbExclamation
-        Exit Sub
-    End If
-
-    ' --- SZÖVEG BESZÚRÁSA A VÁLASZ ELEJÉRE ---
-    Dim beszur As String
-    beszur = "Sziasztok. <br> <br> Átvettük, rendezésig elzártuk.<br><br>"
-
-    mail.HTMLBody = beszur & mail.HTMLBody
+On Error Resume Next
+    ' 1. ESET: Ha a levél külön ablakban van megnyitva
+  If Not Application.ActiveInspector Is Nothing Then
+    Set objDoc = Application.ActiveInspector.WordEditor
+    ' 2. ESET: Ha a levél a főablakba van beágyazva (Inline Response)
+  ElseIf Not Application.ActiveExplorer Is Nothing Then
+    Set objDoc = Application.ActiveExplorer.ActiveInlineResponseWordEditor
+  End If
+    ' Szöveg beillesztése, ha sikerült elérni a szerkesztőt
+  If Not objDoc Is Nothing Then
+    Set objSel = objDoc.Windows(1).Selection
+    objSel.TypeText "Sziasztok." & vbCrLf & vbCrLf & "Átvettük, rendezésig elzártuk."
+  Else
+    MsgBox "Nem található aktív e-mail szerkesztő! Győződj meg róla, hogy épp írsz egy levelet.", vbExclamation, "Hiba"
+  End If
+On Error GoTo 0
 End Sub
 
 
@@ -42,29 +38,25 @@ Sub ValaszSzoveg_II()
 ' CSAK a levél legelejére tud beszúrni szöveget!
 ' DeBug
 
-Dim sel As Outlook.Selection
-Dim mail As Outlook.MailItem
+Dim objDoc As Object
+Dim objSel As Object
 
-    ' Kijelölt elem lekérése
-    Set sel = Application.ActiveExplorer.Selection
-    If sel.Count = 0 Then
-        MsgBox "Nincs kijelölt levél.", vbExclamation
-        Exit Sub
-    End If
-
-    ' Csak MailItem esetén
-    If TypeOf sel.Item(1) Is Outlook.MailItem Then
-        Set mail = sel.Item(1)
-    Else
-        MsgBox "Ez nem e-mail.", vbExclamation
-        Exit Sub
-    End If
-
-    ' --- SZÖVEG BESZÚRÁSA A VÁLASZ ELEJÉRE ---
-    Dim beszur As String
-    beszur = "Sziasztok. <br> <br> Könyvelve, kiadtam.<br><br>"
-
-    mail.HTMLBody = beszur & mail.HTMLBody
+On Error Resume Next
+    ' 1. ESET: Ha a levél külön ablakban van megnyitva
+  If Not Application.ActiveInspector Is Nothing Then
+    Set objDoc = Application.ActiveInspector.WordEditor
+    ' 2. ESET: Ha a levél a főablakba van beágyazva (Inline Response)
+  ElseIf Not Application.ActiveExplorer Is Nothing Then
+    Set objDoc = Application.ActiveExplorer.ActiveInlineResponseWordEditor
+  End If
+    ' Szöveg beillesztése, ha sikerült elérni a szerkesztőt
+  If Not objDoc Is Nothing Then
+    Set objSel = objDoc.Windows(1).Selection
+    objSel.TypeText "Sziasztok." & vbCrLf & vbCrLf & "Könyvelve, kiadtam."
+  Else
+    MsgBox "Nem található aktív e-mail szerkesztő! Győződj meg róla, hogy épp írsz egy levelet.", vbExclamation, "Hiba"
+  End If
+On Error GoTo 0
 End Sub
 
 
@@ -74,30 +66,25 @@ Sub ValaszSzoveg_III()
 ' CSAK a levél legelejére tud beszúrni szöveget!
 ' IQAC
 
-Dim sel As Outlook.Selection
-Dim mail As Outlook.MailItem
+Dim objDoc As Object
+Dim objSel As Object
 
-    ' Kijelölt elem lekérése
-    Set sel = Application.ActiveExplorer.Selection
-    If sel.Count = 0 Then
-        MsgBox "Nincs kijelölt levél.", vbExclamation
-        Exit Sub
-    End If
-
-    ' Csak MailItem esetén
-    If TypeOf sel.Item(1) Is Outlook.MailItem Then
-        Set mail = sel.Item(1)
-    Else
-        MsgBox "Ez nem e-mail.", vbExclamation
-        Exit Sub
-    End If
-
-    ' --- SZÖVEG BESZÚRÁSA A VÁLASZ ELEJÉRE ---
-    Dim beszur As String
-    beszur = "Sziasztok. <br> <br> Elhoztuk, könyvelés alatt.<br><br>"
-
-    mail.HTMLBody = beszur & mail.HTMLBody
+On Error Resume Next
+    ' 1. ESET: Ha a levél külön ablakban van megnyitva
+  If Not Application.ActiveInspector Is Nothing Then
+    Set objDoc = Application.ActiveInspector.WordEditor
+    ' 2. ESET: Ha a levél a főablakba van beágyazva (Inline Response)
+  ElseIf Not Application.ActiveExplorer Is Nothing Then
+    Set objDoc = Application.ActiveExplorer.ActiveInlineResponseWordEditor
+  End If
+    ' Szöveg beillesztése, ha sikerült elérni a szerkesztőt
+  If Not objDoc Is Nothing Then
+    Set objSel = objDoc.Windows(1).Selection
+    objSel.TypeText "Sziasztok." & vbCrLf & vbCrLf & "Elhoztuk, könyvelés alatt."
+  Else
+    MsgBox "Nem található aktív e-mail szerkesztő! Győződj meg róla, hogy épp írsz egy levelet.", vbExclamation, "Hiba"
+  End If
+On Error GoTo 0
 End Sub
-
 
 ```
