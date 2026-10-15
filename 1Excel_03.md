@@ -116,6 +116,7 @@ End Function
 
 Sub Aranyok()
 ' DoWtHen Makró 2026.05.30
+' v2 2026.10.15
 ' Foxconn segédlet
 ' Arányszámítás a WO kittingeléshez
 ' 2026.07.02 -> Flexibilis bárhová helyezhető (még mindig az A és C oszlopból számol)
@@ -125,12 +126,32 @@ Dim kerdes As Integer
 Dim AktualCella As Range
 Dim destRange As Range
 Dim Kijeloles As Range
- 
-UtolsoA = Range("A" & Rows.Count).End(xlUp).Row  'A oszlop utolsó cella száma
+Dim i As Long
+Dim LastRow As Long
+Dim Ertek As String
+
+LastRow = Cells(Rows.Count, "A").End(xlUp).row
+
+For i = LastRow To 1 Step -1
+    Ertek = Trim(Cells(i, "A").Value)
+    
+    ' Csak akkor fogadjuk el, ha -G végű ÉS nem a kizárt anyagszám
+    If Right(Ertek, 2) = "-G" And Ertek <> "1A624J500-600-G" Then
+        UtolsoA = i
+        Exit For
+    End If
+Next i
+
+If UtolsoA = 0 Then
+    MsgBox "Nem találtam '-G' végű sort az A oszlopban (a kizárt értéket nem számítva)!", vbExclamation
+    Exit Sub
+End If
 
 Set AktualCella = ActiveCell 'a kijelölt cella ahova az Arányokat beírja
 
-kerdes = MsgBox("A ""kitting lista"" munkalapon összeszámolja," & vbCrLf & "hogy a WO-ra hány %-nyi" & vbCrLf & "alapanyag van kiadva, könyvelve." & vbCrLf & vbCrLf & vbCrLf & "Képleteket írok a(z)  " & Cells(ActiveCell.Row, ActiveCell.Column).Address(False, False) & "  cellától!" & vbCrLf & "Mehet??" & Space(15) & "====", vbYesNo + vbQuestion, "Adat másolása  Arányok")
+kerdes = MsgBox("A ""kitting lista"" munkalapon összeszámolja," & vbCrLf & "hogy a WO-ra hány %-nyi" & vbCrLf & "alapanyag van kiadva, könyvelve." _
+      & vbCrLf & "Nem számolja a TPM kártyát és csomi anyagokat!" & vbCrLf & vbCrLf & vbCrLf & _
+      "Képleteket írok a(z)  " & Cells(ActiveCell.row, ActiveCell.Column).Address(False, False) & "  cellától!" & vbCrLf & "Mehet??" & Space(15) & "====", vbYesNo + vbQuestion, "Adat másolása  Arányok")
 
  If kerdes <> vbYes Then 'ha nem igen kilépek
         MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
