@@ -420,4 +420,85 @@ lastH = Cells(Rows.Count, "H").End(xlUp).row
 End Sub
 
 
+Sub FIRST_kereses()
+' DoWtHen Makró 2026.11.12
+' Foxconn segédlet
+' kitting FIRST lista kiegészítés a láda számokkal
+' Copolit segítségével (egyszerűsítés, optimalizálás)
+
+Dim wb As Workbook
+Dim kittingWB As Workbook
+Dim feederWB As Workbook
+Dim UtolsoH As Long
+Dim UtolsoA As Long
+Dim UtolsoK As Long
+
+ 'INNEN másold az anyagszámokat
+  For Each wb In Workbooks
+    If wb.Name Like "*összekötött*kittingelni.xlsx" Then
+      Set kittingWB = wb
+      Exit For
+    End If
+  Next wb
+
+  If kittingWB Is Nothing Then
+    MsgBox "Nem található a *összekötött*kittingelni.xlsx fájl!"
+    Exit Sub
+  End If
+ 'INNEN másold az anyagszámokat
+
+ 'IDE másold az anyagszámokat
+  For Each wb In Workbooks
+    If wb.Name Like "*_Devided_feeders.xlsx" Then
+      Set feederWB = wb
+      Exit For
+    End If
+  Next wb
+
+  If feederWB Is Nothing Then
+    MsgBox "Nem található a *_Devided_feeders.xlsx fájl!"
+    Exit Sub
+  End If
+ 'IDE másold az anyagszámokat
+ 
+ ' FIGYELMEZTETÉS INFO szöveg
+  If MsgBox(Space(16) & "A FIRST lista fájlt egészítem ki." & vbCrLf & "Az anyagszámok mellé írom melyik ládában találod meg" & vbCrLf & "az adott alkatrészt." _
+  & vbCrLf & vbCrLf & "A ""kitting lista"" fájból átmásolom az anyagszámokat" & vbCrLf & "a FIRST lista ""Devided_feeders"" fájlba!" & vbCrLf & vbCrLf & _
+    "!! Lehetőleg csak ez a két excel fájl legyen megnyitva !!" & vbCrLf & _
+    "  --------------------------------------------------------" & vbCrLf & vbCrLf & _
+    "Ebből a fájlból másolom: -Kitting lista-" & vbCrLf & kittingWB.Name & vbCrLf & vbCrLf & _
+    "Ebbe a fálba illesztem be: -First lista-" & vbCrLf & feederWB.Name & vbCrLf & vbCrLf & _
+    "Biztosan futtatod a makrót?", vbQuestion + vbYesNo, "FIRST anyag keresés") = vbNo Then
+    MsgBox "Akkor kilépek.", vbInformation, "Mégsem"
+    Exit Sub
+  End If
+ 
+ 'Anyagszám lista Másolás
+UtolsoH = kittingWB.ActiveSheet.Cells(kittingWB.ActiveSheet.Rows.Count, "H").End(xlUp).row 'H oszlop utolsó cella száma
+ 
+    kittingWB.ActiveSheet.Range("H1:J" & UtolsoH).Copy
+    feederWB.ActiveSheet.Range("K1").PasteSpecial Paste:=xlPasteValues
+    
+ 'Képlet létrehozása
+  With feederWB.ActiveSheet
+UtolsoA = Range("A" & Rows.Count).End(xlUp).row  'A oszlop utolsó cella száma
+UtolsoK = Range("K" & Rows.Count).End(xlUp).row  'K oszlop utolsó cella száma
+    
+    .Range("C2").Formula = "=XLOOKUP(A2,K$2:K$" & UtolsoK & ",M$2:M$" & UtolsoK & ","""")"  'angol verzió
+    .Range("C2").AutoFill Destination:=Range("C2:C" & UtolsoA)
+    
+  With Range("C2:C" & UtolsoA)
+    .Value = .Value
+  End With
+    
+    Columns("C:C").EntireColumn.AutoFit 'oszlop széthúzása
+    
+ 'Átmásolt adatok törlése
+    .Range("K1:M" & UtolsoK).ClearContents
+    .Range("C1") = "    LÁDA számok": .Range("C1").Select
+  End With
+  
+    Application.CutCopyMode = False
+End Sub
+
 ```
