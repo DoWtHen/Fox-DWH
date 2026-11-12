@@ -474,31 +474,29 @@ Dim UtolsoK As Long
   End If
  
  'Anyagszám lista Másolás
+    kittingWB.Activate
+ 
 UtolsoH = kittingWB.ActiveSheet.Cells(kittingWB.ActiveSheet.Rows.Count, "H").End(xlUp).row 'H oszlop utolsó cella száma
  
     kittingWB.ActiveSheet.Range("H1:J" & UtolsoH).Copy
     feederWB.ActiveSheet.Range("K1").PasteSpecial Paste:=xlPasteValues
     
  'Képlet létrehozása
-  With feederWB.ActiveSheet
+    feederWB.Activate
+  
 UtolsoA = Range("A" & Rows.Count).End(xlUp).row  'A oszlop utolsó cella száma
 UtolsoK = Range("K" & Rows.Count).End(xlUp).row  'K oszlop utolsó cella száma
     
-    .Range("C2").Formula = "=XLOOKUP(A2,K$2:K$" & UtolsoK & ",M$2:M$" & UtolsoK & ","""")"  'angol verzió
-    .Range("C2").AutoFill Destination:=Range("C2:C" & UtolsoA)
+    Range("C2").Formula = "=XLOOKUP(A2,K$2:K$" & UtolsoK & ",M$2:M$" & UtolsoK & ","""")"  'angol verzió
+    Range("C2").AutoFill Destination:=Range("C2:C" & UtolsoA)
     
-  With Range("C2:C" & UtolsoA)
-    .Value = .Value
-  End With
-    
+    Range("C2:C" & UtolsoA).Value = Range("C2:C" & UtolsoA).Value
     Columns("C:C").EntireColumn.AutoFit 'oszlop széthúzása
     
  'Átmásolt adatok törlése
-    .Range("K1:M" & UtolsoK).ClearContents
-    .Range("C1") = "    LÁDA számok": .Range("C1").Select
-  End With
-  
+    Range("K1:M" & UtolsoK).ClearContents
+    Range("C1") = "    LÁDA számok"
+    Range("C1").Select
     Application.CutCopyMode = False
 End Sub
-
 ```
