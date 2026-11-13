@@ -25,9 +25,3 @@ Sub celsiusfok()
       Selection.TypeText Text:=" "
 End Sub
 ```
-```vba
-Sub InditUserForm()
-    ' WO Sablon Indítása
-    UserForm1.Show
-End Sub
-```
